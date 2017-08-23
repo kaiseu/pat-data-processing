@@ -14,6 +14,7 @@
 import pandas as pd
 
 from component.base import CommonBase
+import numpy as np
 
 
 class Network(CommonBase):
@@ -38,11 +39,13 @@ class Network(CommonBase):
 
         for num in range(num_nics):
             ccc = bbb.iloc[num:len(all_row):num_nics].reset_index(drop=True)
-            nic_average[name_nics[num]] = ccc.mean(axis=0)
-            ccc['TimeStamp'] = time_stamp
+            nic_average[name_nics[num]] = ccc.mean(axis=0)  # average of each nic
+            ccc.insert(0, 'TimeStamp', time_stamp)  # add timestamp to the data frame
             nic_all[name_nics[num]] = ccc
             # print ccc
-        return nic_average, nic_all
+        all_average = np.array(nic_average.values()).mean(axis=0)  # average of all nics
+        # print all_average
+        return all_average, nic_all
 
 
 if __name__ == '__main__':

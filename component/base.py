@@ -15,7 +15,8 @@
 class CommonBase:
     used_col = []
 
-    def __init__(self):
+    def __init__(self, file_path):
+        self.file_path = file_path
         pass
 
     def get_data(self):

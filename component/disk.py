@@ -14,6 +14,7 @@
 import pandas as pd
 
 from component.base import CommonBase
+import numpy as np
 
 
 class Disk(CommonBase):
@@ -43,9 +44,13 @@ class Disk(CommonBase):
         for num in range(num_disks):  # processing each disk
             ccc = bbb.iloc[num:len(all_row):num_disks].reset_index(drop=True)  # every $num_disks is for the same disk
             disk_avg[name_disks[num]] = ccc.mean(axis=0)  # average of each disks
-            ccc['TimeStamp'] = time_stamp  # add timestamp to the data frame
+            # print np.average(disk_avg.values(), axis=0)
+            # print disk_avg
+            ccc.insert(0, 'TimeStamp', time_stamp)  # add timestamp to the data frame
             disk_all[name_disks[num]] = ccc  # save all raw data
-        return disk_avg, disk_all
+        all_average = np.array(disk_avg.values()).mean(axis=0)  # average of all disks
+        # print all_average
+        return all_average, disk_all
 
 
 if __name__ == '__main__':

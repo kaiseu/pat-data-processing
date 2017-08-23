@@ -18,7 +18,7 @@ from component import base
 
 
 class Cpu(base.CommonBase):
-    used_col = ['%user', '%nice', '%system', '%iowait', '%steal', '%idle']
+    used_col = ['TimeStamp', '%user', '%nice', '%system', '%iowait', '%steal', '%idle']
 
     def __init__(self):
         pass
@@ -28,9 +28,8 @@ class Cpu(base.CommonBase):
 
     def get_data(self):
         df = pd.read_csv(self.file_path, delim_whitespace=True,
-                         names=self.used_col,
-                         header=0)
-        avg = np.mean(df.values, 0)
+                         names=self.used_col, header=0)
+        avg = np.mean(df.iloc[:, 1:len(self.used_col)].values, 0)
         return avg, df.values
 
     def used_col_num(self):
