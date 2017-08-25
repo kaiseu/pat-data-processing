@@ -12,14 +12,13 @@
 """
 
 import os
+import time
+
+import pandas as pd
 
 from node import Node
 from utils.commonOps import get_paths
-import numpy as np
-from component.factory import AttribFactory
-import multiprocessing as mp
 from multiprocessing import Pool
-import time
 
 
 class Cluster(Node):
@@ -35,23 +34,22 @@ class Cluster(Node):
             print 'Path: {0} does not exist, will exit...'.format(self.pat_path)
             exit(-1)
 
-    # def get_cluster_avg(self):
-    #     attrib_sum = []
-    #     for node in self.nodes:
-    #         tmp_node = Node(node)
-    #         tmp_sum = {}
-    #         for attrib in tmp_node.node_exist_attrib():
-    #             tmp_sum[attrib] = tmp_node.get_avg_attrib(attrib)
-    #         attrib_sum.append(tmp_sum)
-    #     print attrib_sum
+            # def get_cluster_avg(self):
+            #     attrib_avg = {}
+            #     for attrib in self.attrib:
+            #         attrib_avg[attrib] = np.sum([Node(node).get_avg_attrib(attrib) for node in self.nodes], axis=0) / len(
+            #             self.nodes)
+            #         print 'average {0} utilization: \n {1}'.format(attrib, attrib_avg[attrib])
+            #     print attrib_avg
 
     def get_cluster_avg(self):
-        attrib_avg = {}
+        attrib_avg = dict()
         for attrib in self.attrib:
-            attrib_avg[attrib] = np.sum([Node(node).get_avg_attrib(attrib) for node in self.nodes], axis=0) / len(
-                self.nodes)
-            print 'average {0} utilization: \n {1}'.format(attrib, attrib_avg[attrib])
-        print attrib_avg
+            tmp = [(Node(node).get_avg_attrib(attrib)) for node in self.nodes]
+            attrib_all = pd.concat(tmp, axis=1).transpose()
+            attrib_avg[attrib] = pd.DataFrame(attrib_all.mean()).transpose()
+
+        return attrib_avg
 
         # def get_cluster_avg(self):
         #     mp.freeze_support()
@@ -59,18 +57,21 @@ class Cluster(Node):
         #         process = mp.Process(target=Node(node).get_node_avg())
         #         process.start()
 
-        # def get_cluster_avg(self):
-        #     pool = Pool()
-        #     result = [pool.apply_async(Node(node).get_node_avg()) for node in self.nodes]
-        #     print result
+        def get_cluster_avg(self):
+            pool = Pool()
+            result = [pool.apply_async(Node(node).get_node_avg()) for node in self.nodes]
+            print result
 
-    def print_cluster_avg(self):
-        attrib_avg = self.get_avg_attrib()
+    def print_cluster_avg1(self):
+        attrib_avg = self.get_cluster_avg()
+        for key in attrib_avg.keys():
+            print 'All nodes average {0} utilization: \n {1} \n'.format(key, attrib_avg.get(key).to_string(index=False))
+
 
 if __name__ == '__main__':
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1\\instruments\\'
+    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\'
     cluster = Cluster(pat_path)
     start = time.time()
-    cluster.get_cluster_avg()
+    cluster.print_cluster_avg1()
     end = time.time()
     print 'elapsed time: {0}'.format(end - start)

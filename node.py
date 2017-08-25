@@ -39,7 +39,7 @@ class Node:
                 print 'node does not have attribute {0}'.format(attrib)
                 exit(-1)
         else:
-            print 'Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
+            print 'Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...'\
                 .format(attrib, AttribFactory.node_attrib.keys())
             exit(-1)
 
@@ -49,8 +49,7 @@ class Node:
             attrib_sum.append(self.get_avg_attrib(attrib))
         return attrib_sum
 
-
 if __name__ == '__main__':
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_dynamic_disable_1TB_r1\\instruments\\hsx-node10'
+    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\bd20'
     node = Node(pat_path)
-    print node.get_avg_attrib('network')
+    print node.get_avg_attrib('disk')

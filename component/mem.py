@@ -27,7 +27,7 @@ class Mem(CommonBase):
     def get_data(self):
         df = pd.read_csv(self.file_path, delim_whitespace=True,
                          skiprows=(lambda i: i % 2 == 0), usecols=self.used_col, names=self.names)
-        avg = np.mean(df.iloc[:, 1:len(self.used_col)].values, 0)
+        avg = df.iloc[:, 1:len(self.used_col)].astype('float32').mean(axis=0)
         return avg, df.values
 
     def used_col_num(self):

@@ -29,8 +29,10 @@ class Cpu(base.CommonBase):
     def get_data(self):
         df = pd.read_csv(self.file_path, delim_whitespace=True,
                          names=self.used_col, header=0)
-        avg = np.mean(df.iloc[:, 1:len(self.used_col)].values, 0)
+        # avg = np.mean(df.iloc[:, 1:len(self.used_col)].values, 0)
+        avg = df.iloc[:, 1:len(self.used_col)].astype('float32').mean()
         return avg, df.values
+
 
     def used_col_num(self):
         return len(self.__used_col)
