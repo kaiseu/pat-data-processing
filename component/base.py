@@ -21,3 +21,6 @@ class CommonBase:
 
     def get_data(self):
         print "base extract method"
+
+    def get_data_by_time(self, start, end):
+        pass

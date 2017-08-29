@@ -43,6 +43,20 @@ class Node:
                 .format(attrib, AttribFactory.node_attrib.keys())
             exit(-1)
 
+    def get_avg_attrib_by_time(self, attrib, start, end):
+        if attrib.lower() in AttribFactory.node_attrib.keys():
+            attrib_file = self.file_path + os.sep + AttribFactory.node_attrib[attrib.lower()]
+            if os.path.isfile(attrib_file):
+                # print attrib_file
+                return AttribFactory.create_attrib(attrib, attrib_file).get_data_by_time(start, end)[0]
+            else:
+                print 'node does not have attribute {0}'.format(attrib)
+                exit(-1)
+        else:
+            print 'Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...'\
+                .format(attrib, AttribFactory.node_attrib.keys())
+            exit(-1)
+
     def get_node_avg(self):
         attrib_sum = []
         for attrib in self.node_exist_attrib():
@@ -52,4 +66,4 @@ class Node:
 if __name__ == '__main__':
     pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\bd20'
     node = Node(pat_path)
-    print node.get_avg_attrib('disk')
+    print node.get_avg_attrib('mem')

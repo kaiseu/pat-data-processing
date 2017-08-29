@@ -19,6 +19,7 @@ import pandas as pd
 from node import Node
 from utils.commonOps import get_paths
 from multiprocessing import Pool
+from datetime import datetime
 
 
 class Cluster(Node):
@@ -48,7 +49,6 @@ class Cluster(Node):
             tmp = [(Node(node).get_avg_attrib(attrib)) for node in self.nodes]
             attrib_all = pd.concat(tmp, axis=1).transpose()
             attrib_avg[attrib] = pd.DataFrame(attrib_all.mean()).transpose()
-
         return attrib_avg
 
         # def get_cluster_avg(self):
@@ -62,16 +62,32 @@ class Cluster(Node):
             result = [pool.apply_async(Node(node).get_node_avg()) for node in self.nodes]
             print result
 
-    def print_cluster_avg1(self):
+    def get_cluster_avg_by_time(self, start, end):
+        attrib_avg = dict()
+        for attrib in self.attrib:
+            tmp = [(Node(node).get_avg_attrib_by_time(attrib, start, end)) for node in self.nodes]
+            attrib_all = pd.concat(tmp, axis=1).transpose()
+            attrib_avg[attrib] = pd.DataFrame(attrib_all.mean()).transpose()
+        return attrib_avg
+
+    def print_cluster_avg(self):
         attrib_avg = self.get_cluster_avg()
         for key in attrib_avg.keys():
             print 'All nodes average {0} utilization: \n {1} \n'.format(key, attrib_avg.get(key).to_string(index=False))
 
+    def print_cluster_avg_by_time(self, start, end):
+        attrib_avg = self.get_cluster_avg_by_time(start, end)
+        start_time = datetime.fromtimestamp(start).strftime('%Y-%m-%d %H:%M:%S')
+        end_time = datetime.fromtimestamp(end).strftime('%Y-%m-%d %H:%M:%S')
+        print '\nAll nodes average utilization between {0} and {1}'.format(start_time, end_time)
+        for key in attrib_avg.keys():
+            print 'All nodes average {0} utilization: \n {1} \n'.format(key, attrib_avg.get(key).to_string(index=False))
 
 if __name__ == '__main__':
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\'
+    # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\'
+    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1\\instruments\\'
     cluster = Cluster(pat_path)
     start = time.time()
-    cluster.print_cluster_avg1()
+    cluster.print_cluster_avg_by_time(1487687155, 1487687164)
     end = time.time()
-    print 'elapsed time: {0}'.format(end - start)
+    print 'Processing elapsed time: {0}'.format(end - start)

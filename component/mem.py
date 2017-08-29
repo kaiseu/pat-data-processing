@@ -25,10 +25,35 @@ class Mem(CommonBase):
         self.file_path = file_path
 
     def get_data(self):
+        """
+        get average value of this attribute and all value align with timestamp 
+        :return: average value, all value
+        """
         df = pd.read_csv(self.file_path, delim_whitespace=True,
                          skiprows=(lambda i: i % 2 == 0), usecols=self.used_col, names=self.names)
         avg = df.iloc[:, 1:len(self.used_col)].astype('float32').mean(axis=0)
         return avg, df.values
 
+    def get_data_by_time(self, start, end):
+        """
+        get average value of this attribute and all value within the start and end timestamp
+        :param start: start timestamp
+        :param end: end timestamp
+        :return: average value, all value within the given timestamp
+        """
+        df = pd.read_csv(self.file_path, delim_whitespace=True,
+                         skiprows=(lambda i: i % 2 == 0), usecols=self.used_col, names=self.names)
+        mask = (df['TimeStamp'] >= start) & (df['TimeStamp'] <= end)
+        df = df.loc[mask]
+        avg = df.iloc[:, 1:len(self.used_col)].astype('float32').mean(axis=0)
+        return avg, df
+
     def used_col_num(self):
         return len(self.__used_col)
+
+
+if __name__ == '__main__':
+    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\bd20\\memstat'
+    mem = Mem(pat_path)
+    mem.get_data_by_time(1502436986, 1502436998)
+
