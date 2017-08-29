@@ -75,7 +75,7 @@ class Disk(CommonBase):
         for num in range(num_disks):  # processing each disk
             disk_data = df.iloc[num:len(all_row):num_disks].reset_index(drop=True)  # every $num_disks is for the same disk
             disk_avg[name_disks[num]] = disk_data[self.used_col[2:]].astype('float32').mean(axis=0)  # average of each disks
-            mask = (disk_data['TimeStamp'] >= str(start)) & (disk_data['TimeStamp'] <= str(end))
+            mask = (disk_data['TimeStamp'] >= int(start)) & (disk_data['TimeStamp'] <= int(end))
             disk_all[name_disks[num]] = disk_data.loc[mask].reset_index(drop=True)  # save all raw data
         # the name of disk whose value is smallest among all disks, which is considered as os drive
         # if the node has disks mounted but unused, this disk will be regarded as the smallest,
@@ -90,8 +90,8 @@ class Disk(CommonBase):
 
 if __name__ == '__main__':
     # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\bd20\\iostat'
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1\\instruments\\hsx-node6\\iostat'
-    disk_all = Disk(pat_path).get_data_by_time(1487687155, 1487687164)
+    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1\\instruments\\hsx-node1\\iostat'
+    disk_all = Disk(pat_path).get_data_by_time(1487687766, 1487693339)
 
     # print disk_all
 

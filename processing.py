@@ -36,11 +36,12 @@ def env_check():
 if __name__ == '__main__':
     env_check()
     pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
-    bb_log_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_spark163_1TB_r1'
+    bb_log_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
     cluster = Cluster(pat_path)
     bb_phase = BBPhase(bb_log_path)
-    start = time.time()
-    start, end = bb_phase.get_stamp_by_phase('POWER_TEST')
+    begin = time.time()
+    start, end = bb_phase.get_stamp_by_phase('BENCHMARK')
+    print 'start timestamp is: {0} \nend timestamp is: {1} \n'.format(start, end)
     cluster.print_cluster_avg_by_time(start, end)
-    end = time.time()
-    print 'elapsed time: {0}'.format(end - start)
+    stop = time.time()
+    print 'elapsed time: {0}'.format(stop - begin)

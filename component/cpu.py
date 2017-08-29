@@ -46,7 +46,7 @@ class Cpu(base.CommonBase):
         """
         df = pd.read_csv(self.file_path, delim_whitespace=True,
                          usecols=self.used_col, header=0)
-        mask = (df['TimeStamp'] >= start) & (df['TimeStamp'] <= end)
+        mask = (df['TimeStamp'] >= int(start)) & (df['TimeStamp'] <= int(end))
         df = df.loc[mask]
         avg = df.iloc[:, 1:len(self.used_col)].astype('float32').mean()
         return avg, df

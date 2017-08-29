@@ -17,13 +17,13 @@ import pandas as pd
 
 class BBPhase:
     """
-    Phase TPCx-BB log from BigBenchTimes.csv
+    Parse TPCx-BB log from BigBenchTimes.csv
     """
     phase_name = ['BENCHMARK', 'LOAD_TEST', 'POWER_TEST', 'THROUGHPUT_TEST_1', 'VALIDATE_POWER_TEST', 'VALIDATE_THROUGHPUT_TEST_1']
 
     def __init__(self, bb_log_path):
         """
-        Constructor for phase TPCx-BB log
+        Constructor for parse TPCx-BB log
         :param bb_log_path: TPCx-BB log path, dir 'run-logs' is not included
         """
         self.bb_log_path = bb_log_path
@@ -51,7 +51,6 @@ class BBPhase:
                 query_num = (pd.isnull(df['queryNumber']))
                 mask = benchmark_phase & stream_num & query_num
                 line = df[mask]
-                print line
                 phase_start = line['epochStartTimestamp'].values / 1000
                 phase_end = line['epochEndTimestamp'].values / 1000
                 return phase_start, phase_end

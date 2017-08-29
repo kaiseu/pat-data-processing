@@ -86,9 +86,9 @@ class Cluster(Node):
 
 if __name__ == '__main__':
     # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\'
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1\\instruments\\'
+    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1'
     cluster = Cluster(pat_path)
     start = time.time()
-    cluster.print_cluster_avg_by_time(1487687155, 1487687164)
+    cluster.print_cluster_avg_by_time(1487687766, 1487693339)
     end = time.time()
     print 'Processing elapsed time: {0}'.format(end - start)

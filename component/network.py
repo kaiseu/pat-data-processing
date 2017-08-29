@@ -60,10 +60,10 @@ class Network(CommonBase):
         df = df[df['TimeStamp'] != 'TimeStamp']  # drop rows from df that contains 'TimeStamp'
         df.pop('IFACE')
 
-        time_stamp = df['TimeStamp'].loc[0:len(all_row):num_nics].reset_index(drop=True)  # time
+        time_stamp = df['TimeStamp'].loc[0:len(all_row):num_nics].reset_index(drop=True).astype('int64')  # time
         nic_average = pd.DataFrame()
         nic_all = {}
-        mask = (time_stamp >= str(start)) & (time_stamp <= str(end))
+        mask = (time_stamp >= int(start)) & (time_stamp <= int(end))
         for num in range(num_nics):
             nic_data = df.iloc[num:len(all_row):num_nics].reset_index(drop=True)
             bbb = nic_data[mask]
@@ -79,4 +79,4 @@ class Network(CommonBase):
 if __name__ == '__main__':
     # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\bd20\\netstat'
     pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1\\instruments\\hsx-node5\\netstat'
-    Network(pat_path).get_data_by_time(1487687155, 1487687164)
+    Network(pat_path).get_data_by_time(1487687766, 1487693339)
