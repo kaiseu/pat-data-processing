@@ -20,11 +20,12 @@ from node import Node
 from utils.commonOps import get_paths
 from multiprocessing import Pool
 from datetime import datetime
+import os
 
 
 class Cluster(Node):
     def __init__(self, pat_path):
-        self.pat_path = pat_path
+        self.pat_path = pat_path + os.sep + 'instruments'
         self.nodes = self.get_nodes()
         self.attrib = Node(self.nodes[0]).node_exist_attrib()
 
