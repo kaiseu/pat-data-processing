@@ -58,10 +58,3 @@ class Mem(CommonBase):
 
     def used_col_num(self):
         return len(self.__used_col)
-
-
-if __name__ == '__main__':
-    pat_path = '/home/xuk1/Documents/BigBench_results/Sugon/intel/HoS/27-workers/pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_5S_r3/instruments/bd20/memstat'
-    # mem = Mem(pat_path).get_data_by_time(1503046872, 1503165891)
-    mem = Mem(pat_path).get_data()
-    print mem
