@@ -37,7 +37,7 @@ class Cpu(base.CommonBase):
                          usecols=self.used_col, header=0)
         # avg = np.mean(df.iloc[:, 1:len(self.used_col)].values, 0)
         avg = df.iloc[:, 1:len(self.used_col)].astype('float32').mean()
-        return avg, df.values
+        return avg, df
 
     def get_data_by_time(self, start, end):
         """
