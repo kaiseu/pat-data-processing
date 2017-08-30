@@ -12,14 +12,16 @@
 """
 
 import os
+
 import pandas as pd
 
 
-class BBPhase:
+class BBParse:
     """
     Parse TPCx-BB log from BigBenchTimes.csv
     """
-    phase_name = ['BENCHMARK', 'LOAD_TEST', 'POWER_TEST', 'THROUGHPUT_TEST_1', 'VALIDATE_POWER_TEST', 'VALIDATE_THROUGHPUT_TEST_1']
+    phase_name = ['BENCHMARK', 'LOAD_TEST', 'POWER_TEST', 'THROUGHPUT_TEST_1',
+                  'VALIDATE_POWER_TEST', 'VALIDATE_THROUGHPUT_TEST_1']
 
     def __init__(self, bb_log_path):
         """
@@ -65,7 +67,6 @@ class BBPhase:
                 query_num = (pd.isnull(df['queryNumber']))
                 mask = benchmark_phase & stream_num & query_num
                 line = df[mask]
-                print line
                 phase_start = line['epochStartTimestamp'].values / 1000
                 phase_end = line['epochEndTimestamp'].values / 1000
                 return phase_start, phase_end
@@ -80,7 +81,6 @@ class BBPhase:
                 query_num = ((df['queryNumber']) == int(stream_query_num[1]))
                 mask = benchmark_phase & stream_num & query_num
                 line = df[mask]
-                print line
                 phase_start = line['epochStartTimestamp'].values / 1000
                 phase_end = line['epochEndTimestamp'].values / 1000
                 return phase_start, phase_end
@@ -91,7 +91,6 @@ class BBPhase:
             print 'phase name must be assigned! phase name only includes: {0}'.format(self.phase_name)
             exit(-1)
 
-
-if __name__ == '__main__':
-    bb_phase = BBPhase('C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_spark163_1TB_r1')
-    bb_phase.get_stamp_by_phase('POWER_TEST')
+# if __name__ == '__main__':
+#     bb_phase = BBPhase('C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_spark163_1TB_r1')
+#     bb_phase.get_stamp_by_phase('POWER_TEST')

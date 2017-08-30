@@ -11,13 +11,15 @@
 
 """
 
-import numpy as np
 import pandas as pd
 
 from component import base
 
 
 class Cpu(base.CommonBase):
+    """
+    Node CPU attribute, phasing cpu data from original PAT file
+    """
     used_col = ['TimeStamp', '%user', '%nice', '%system', '%iowait', '%steal', '%idle']
 
     def __init__(self):
@@ -53,10 +55,3 @@ class Cpu(base.CommonBase):
 
     def used_col_num(self):
         return len(self.__used_col)
-
-
-if __name__ == '__main__':
-    # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\bd21\\cpustat'
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1\\instruments\\hsx-node6\\cpustat'
-    mem = Cpu(pat_path)
-    mem.get_data_by_time(1487687152, 1487687182)

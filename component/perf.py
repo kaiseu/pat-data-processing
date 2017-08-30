@@ -11,8 +11,21 @@
 
 """
 
+import pandas as pd
+
 from base import CommonBase
 
 
 class Perf(CommonBase):
-    pass
+    """
+    Node perf attribute, not implement yet
+    """
+
+    def __init__(self):
+        pass
+
+    def get_data(self):
+        return pd.DataFrame(), pd.DataFrame()
+
+    def get_data_by_time(self, start, end):
+        return pd.DataFrame(), pd.DataFrame()

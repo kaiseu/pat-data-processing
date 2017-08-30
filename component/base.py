@@ -13,6 +13,9 @@
 
 
 class CommonBase:
+    """
+    Base class for node attribute
+    """
     used_col = []
 
     def __init__(self, file_path):

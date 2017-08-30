@@ -11,11 +11,16 @@
 
 """
 
-from component.base import CommonBase
 import pandas as pd
+
+from component.base import CommonBase
 
 
 class Vmstat(CommonBase):
+    """
+    Node VM attribute, not implement yet
+    """
+
     def __init__(self, file_path):
         self.file_path = file_path
         pass

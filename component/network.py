@@ -17,12 +17,19 @@ from component.base import CommonBase
 
 
 class Network(CommonBase):
+    """
+    Node network attribute, phasing network data from original PAT file
+    """
     used_col = ['TimeStamp', 'IFACE', 'rxkB/s', 'txkB/s']
 
     def __init__(self, file_path):
         self.file_path = file_path
 
     def get_data(self):
+        """
+        get average value of this attribute and all value
+        :return: average value, all value
+        """
         df = pd.read_csv(self.file_path, delim_whitespace=True, usecols=self.used_col, header=0)
         all_row = list(df['TimeStamp'].str.contains('TimeStamp'))
         num_nics = all_row.index(True)  # num of NICs
@@ -70,13 +77,8 @@ class Network(CommonBase):
             ccc_avg = bbb[self.used_col[2:]].astype('float32').mean(axis=0)
             # ignore local lookback, ignore the NICs whose average value all smaller than 100
             if (name_nics[num] != 'lo') & all(x > 100 for x in ccc_avg):
-                    nic_average[name_nics[num]] = ccc_avg  # average of each nic
-                    nic_all[name_nics[num]] = bbb
+                nic_average[name_nics[num]] = ccc_avg  # average of each nic
+                nic_all[name_nics[num]] = bbb
         # print nic_average.transpose()
         all_average = nic_average.mean(axis=1)  # average of all nics
         return all_average, nic_all
-
-if __name__ == '__main__':
-    # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\bd20\\netstat'
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1\\instruments\\hsx-node5\\netstat'
-    Network(pat_path).get_data_by_time(1487687766, 1487693339)

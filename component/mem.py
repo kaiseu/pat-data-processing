@@ -11,13 +11,15 @@
 
 """
 
-import numpy as np
 import pandas as pd
 
 from component.base import CommonBase
 
 
 class Mem(CommonBase):
+    """
+    Node memory attribute, phasing memory data from original PAT file
+    """
     used_col = [1, 13, 14, 16, 17]  # names = ['TimeStamp', 'kbmemfree', 'kbmemused', 'kbbuffers', 'kbcached']
     names = ['TimeStamp', 'kbmemfree', 'kbmemused', 'kbbuffers', 'kbcached']
 
@@ -50,10 +52,3 @@ class Mem(CommonBase):
 
     def used_col_num(self):
         return len(self.__used_col)
-
-
-if __name__ == '__main__':
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\bd20\\memstat'
-    mem = Mem(pat_path)
-    mem.get_data_by_time(1502436986, 1502436998)
-

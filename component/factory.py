@@ -12,21 +12,30 @@
 """
 
 from component.cpu import Cpu
+from component.disk import Disk
+from component.jvms import Jvms
 from component.mem import Mem
 from component.network import Network
-from component.disk import Disk
 from component.perf import Perf
 from component.vmstat import Vmstat
-from component.jvms import Jvms
 
 
 class AttribFactory:
-    node_attrib = {'cpu': 'cpustat', 'mem': 'memstat', 'disk': 'iostat', 'network': 'netstat', 'perf': 'perfout', 'vmstat': 'vmstat', 'jvms': 'jvms'}
+    """
+    Factory class for each attribute
+    """
+    node_attrib = {'cpu': 'cpustat', 'mem': 'memstat', 'disk': 'iostat', 'network': 'netstat', 'perf': 'perfout',
+                   'vmstat': 'vmstat', 'jvms': 'jvms'}
 
     def __init__(self):
         pass
 
     def get_attrib(self, value):
+        """
+        get attrib key from its corresponding value
+        :param value: attrib value
+        :return: attrib key
+        """
         for attrib in self.node_attrib:
             if value == self.node_attrib[attrib]:
                 return attrib
@@ -50,4 +59,3 @@ class AttribFactory:
         else:
             print 'No attrib: {0} defined, will exit...'.format(attrib)
             exit(-1)
-

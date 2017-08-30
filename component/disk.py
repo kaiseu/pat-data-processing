@@ -14,21 +14,22 @@
 import pandas as pd
 
 from component.base import CommonBase
-import numpy as np
 
 
 class Disk(CommonBase):
+    """
+    Node iostat attribute, phasing disk data from original PAT file
+    """
     used_col = ['TimeStamp', 'Device:', 'r/s', 'w/s', 'rkB/s', 'wkB/s', 'await', '%util']
 
     def __init__(self, file_path):
         self.file_path = file_path
 
-    """
-    phasing disk data from original PAT file
-    
-    """
-
     def get_data(self):
+        """
+        get average value of this attribute and all value
+        :return: each disk averaged and sum all the disks, all value
+        """
         df = pd.read_csv(self.file_path, delim_whitespace=True, usecols=self.used_col, header=0)
         all_row = list(df['TimeStamp'].str.contains('TimeStamp'))
         # all the number of disks collected which is equal to the index of first 'True' in the list
@@ -73,8 +74,10 @@ class Disk(CommonBase):
         disk_avg = pd.DataFrame()  # save avg result of each disk
         disk_all = {}  # save raw data of each disk
         for num in range(num_disks):  # processing each disk
-            disk_data = df.iloc[num:len(all_row):num_disks].reset_index(drop=True)  # every $num_disks is for the same disk
-            disk_avg[name_disks[num]] = disk_data[self.used_col[2:]].astype('float32').mean(axis=0)  # average of each disks
+            disk_data = df.iloc[num:len(all_row):num_disks].reset_index(
+                drop=True)  # every $num_disks is for the same disk
+            disk_avg[name_disks[num]] = disk_data[self.used_col[2:]].astype('float32').mean(
+                axis=0)  # average of each disks
             mask = (disk_data['TimeStamp'] >= int(start)) & (disk_data['TimeStamp'] <= int(end))
             disk_all[name_disks[num]] = disk_data.loc[mask].reset_index(drop=True)  # save all raw data
         # the name of disk whose value is smallest among all disks, which is considered as os drive
@@ -86,12 +89,3 @@ class Disk(CommonBase):
         disk_avg_sum = disk_avg.sum(axis=1)  # the sum of all the averaged disks
         # disk_all.pop(os_disk)  # ignore os drive
         return disk_avg_sum, disk_all
-
-
-if __name__ == '__main__':
-    # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\bd20\\iostat'
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1\\instruments\\hsx-node1\\iostat'
-    disk_all = Disk(pat_path).get_data_by_time(1487687766, 1487693339)
-
-    # print disk_all
-
