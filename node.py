@@ -34,7 +34,7 @@ class Node:
         exist_attrib = []
         for names in file_names:
             exist_attrib.append(AttribFactory().get_attrib(names))
-        return exist_attrib
+        return sorted(exist_attrib)
 
     def get_avg_attrib(self, attrib):
         """

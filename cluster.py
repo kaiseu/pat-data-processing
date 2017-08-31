@@ -101,6 +101,40 @@ class Cluster(Node):
         for key in attrib_avg.keys():
             print 'Average {0} utilization: \n {1} \n'.format(key, attrib_avg.get(key).to_string(index=False))
 
+    def save_avg_results(self, *option):
+        """
+        Save results to file
+        :param option: optional inputs must be (start_timestamp, end_timestamp) 
+        or (start_timestamp, end_timestamp, phase)
+        :return: None
+        """
+        num_input = len(option)
+        result_file = self.pat_path + os.sep + 'results.txt'
+        with open(result_file, 'w') as f:
+            if not option:
+                attrib_avg = self.get_cluster_avg()
+                for key in attrib_avg.keys():
+                    f.write('All nodes average {0} utilization: \n {1} \n'
+                            .format(key, attrib_avg.get(key).to_string(index=False)))
+            if num_input == 2:
+                attrib_avg = self.get_cluster_avg()
+                start_time = datetime.fromtimestamp(option[0]).strftime('%Y-%m-%d %H:%M:%S')
+                end_time = datetime.fromtimestamp(option[1]).strftime('%Y-%m-%d %H:%M:%S')
+                f.write('All nodes average utilization between {0} and {1}:\n'.format(start_time, end_time))
+            elif num_input == 3:
+                attrib_avg = self.get_cluster_avg_by_time(option[0], option[1])
+                start_time = datetime.fromtimestamp(option[0]).strftime('%Y-%m-%d %H:%M:%S')
+                end_time = datetime.fromtimestamp(option[1]).strftime('%Y-%m-%d %H:%M:%S')
+                f.write('All nodes average utilization for phase {0} between {1} and {2}:\n'
+                        .format(option[2], start_time, end_time))
+            elif num_input == 1 or num_input > 3:
+                print 'optional inputs must be (start_timestamp, end_timestamp) ' \
+                      'or (start_timestamp, end_timestamp, phase)'
+                exit(-1)
+            for key in attrib_avg.keys():
+                f.write('\nAverage {0} utilization: \n {1} \n'.format(key, attrib_avg.get(key).to_string(index=False)))
+            print 'Results have been saved to: {0}'.format(result_file)
+
 
 if __name__ == '__main__':
     """
@@ -109,6 +143,6 @@ if __name__ == '__main__':
     pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1'
     cluster = Cluster(pat_path)
     start = time.time()
-    cluster.print_cluster_avg_by_time(1487687766, 1487693339)
+    cluster.save_avg_results(1487687766, 1487693339)
     end = time.time()
     print 'Processing elapsed time: {0}'.format(end - start)

@@ -47,7 +47,7 @@ if __name__ == '__main__':
         pat_path = sys.argv[1]
         begin = time.time()
         cluster = Cluster(pat_path)
-        cluster.print_cluster_avg()
+        cluster.save_avg_results()
         stop = time.time()
         print 'elapsed time: {0}'.format(stop - begin)
     elif arg_len == 3:
@@ -59,7 +59,7 @@ if __name__ == '__main__':
         bb_parse = BBParse(bb_log_path)
         for phase in phase_name[0:4]:
             start, end = bb_parse.get_stamp_by_phase(phase)
-            cluster.print_cluster_avg_by_time(start, end, phase)
+            cluster.save_avg_results(start, end, phase)
         stop = time.time()
         print 'elapsed time: {0}'.format(stop - begin)
     elif arg_len == 4:
@@ -73,9 +73,9 @@ if __name__ == '__main__':
             bb_parse = BBParse(bb_log_path)
 
             start, end = bb_parse.get_stamp_by_phase(phase)
-            cluster.print_cluster_avg_by_time(start, end, phase)
+            cluster.save_avg_results(start, end, phase)
             stop = time.time()
-            print 'elapsed time: {0}'.format(stop - begin)
+            print 'Processing elapsed time: {0}'.format(stop - begin)
         else:
             print 'Supported benchmark phase only includes: {0}'.format(phase_name)
     else:
