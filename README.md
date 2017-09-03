@@ -15,3 +15,6 @@ which includes:'BENCHMARK', 'LOAD_TEST', 'POWER_TEST', 'THROUGHPUT_TEST_1', 'VAL
 The result which contains the average System resource utilization(CPU, Memory, Disk I/O, Network I/O...) of a cluster will be saved in $pat_path/instruments/results.txt
 
 
+Depedencies: 
+Python 2.7+
+Numpy
