@@ -48,6 +48,7 @@ class Network(CommonBase):
                 if all(x > 100 for x in ccc_avg):  # ignore the NICs whose average value all smaller than 100
                     nic_average[name_nics[num]] = ccc_avg  # average of each nic
                     ccc.insert(0, 'TimeStamp', time_stamp)  # add timestamp to the data frame
+                    ccc = ccc.set_index('TimeStamp')
                     nic_all[name_nics[num]] = ccc
         # print nic_average.transpose()
         all_average = nic_average.transpose().mean(axis=0)  # average of all nics
@@ -70,10 +71,12 @@ class Network(CommonBase):
         time_stamp = df['TimeStamp'].loc[0:len(all_row):num_nics].reset_index(drop=True).astype('int64')  # time
         nic_average = pd.DataFrame()
         nic_all = {}
-        mask = (time_stamp >= int(start)) & (time_stamp <= int(end))
+        # mask = (time_stamp >= int(start)) & (time_stamp <= int(end))
         for num in range(num_nics):
             nic_data = df.iloc[num:len(all_row):num_nics].reset_index(drop=True)
-            bbb = nic_data[mask]
+            # bbb = nic_data[mask]
+            pd.to_datetime(nic_data['TimeStamp'], unit='s')
+            bbb = nic_data.set_index('TimeStamp').loc[str(start): str(end)]
             ccc_avg = bbb[self.used_col[2:]].astype('float32').mean(axis=0)
             # ignore local lookback, ignore the NICs whose average value all smaller than 100
             if (name_nics[num] != 'lo') & all(x > 100 for x in ccc_avg):

@@ -14,6 +14,7 @@
 import pandas as pd
 
 from component.base import CommonBase
+from  datetime import datetime
 
 
 class Disk(CommonBase):
@@ -40,12 +41,14 @@ class Disk(CommonBase):
         bbb = df[self.used_col[2:]].astype('float32')  # raw data
 
         time_stamp = df['TimeStamp'].loc[0:len(all_row):num_disks].reset_index(drop=True)  # time
+        pd.to_datetime(time_stamp, unit='s')
         disk_avg = pd.DataFrame()  # save avg result of each disk
         disk_all = {}  # save raw data of each disk
         for num in range(num_disks):  # processing each disk
             ccc = bbb.iloc[num:len(all_row):num_disks].reset_index(drop=True)  # every $num_disks is for the same disk
             disk_avg[name_disks[num]] = ccc.mean(axis=0)  # average of each disks
             ccc.insert(0, 'TimeStamp', time_stamp)  # add timestamp to the data frame
+            ccc = ccc.set_index('TimeStamp')
             disk_all[name_disks[num]] = ccc  # save all raw data
         # the name of disk whose value is smallest among all disks, which is considered as os drive
         # if the node has disks mounted but unused, this disk will be regarded as the smallest,
@@ -78,8 +81,9 @@ class Disk(CommonBase):
                 drop=True)  # every $num_disks is for the same disk
             disk_avg[name_disks[num]] = disk_data[self.used_col[2:]].astype('float32').mean(
                 axis=0)  # average of each disks
-            mask = (disk_data['TimeStamp'] >= int(start)) & (disk_data['TimeStamp'] <= int(end))
-            disk_all[name_disks[num]] = disk_data.loc[mask].reset_index(drop=True)  # save all raw data
+            pd.to_datetime(disk_data['TimeStamp'], unit='s')
+            disk_data = disk_data.set_index('TimeStamp').loc[str(start): str(end)]
+            disk_all[name_disks[num]] = disk_data  # save all raw data
         # the name of disk whose value is smallest among all disks, which is considered as os drive
         # if the node has disks mounted but unused, this disk will be regarded as the smallest,
         # so no recommended mount unused disk to the nodes

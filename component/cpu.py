@@ -14,6 +14,7 @@
 import pandas as pd
 
 from component import base
+from datetime import datetime
 
 
 class Cpu(base.CommonBase):
@@ -35,7 +36,8 @@ class Cpu(base.CommonBase):
         """
         df = pd.read_csv(self.file_path, delim_whitespace=True,
                          usecols=self.used_col, header=0)
-        # avg = np.mean(df.iloc[:, 1:len(self.used_col)].values, 0)
+        df['TimeStamp'] = df['TimeStamp'].astype('datetime64[s]')
+        df = df.set_index('TimeStamp')
         avg = df.iloc[:, 1:len(self.used_col)].astype('float32').mean()
         return avg, df
 
@@ -48,8 +50,14 @@ class Cpu(base.CommonBase):
         """
         df = pd.read_csv(self.file_path, delim_whitespace=True,
                          usecols=self.used_col, header=0)
-        mask = (df['TimeStamp'] >= int(start)) & (df['TimeStamp'] <= int(end))
-        df = df.loc[mask]
+        # df['TimeStamp'] = df['TimeStamp'].astype('datetime64[s]')
+        pd.to_datetime(df['TimeStamp'], unit='s')
+        df = df.set_index('TimeStamp')
+        # start = datetime.utcfromtimestamp(start)
+        # end = datetime.utcfromtimestamp(end)
+        df = df.loc[start: end]
+        # mask = (df['TimeStamp'] >= int(start)) & (df['TimeStamp'] <= int(end))
+        # df = df.loc[mask]
         avg = df.iloc[:, 1:len(self.used_col)].astype('float32').mean()
         return avg, df
 

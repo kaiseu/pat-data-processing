@@ -36,6 +36,8 @@ class Mem(CommonBase):
         df = pd.read_csv(self.file_path, delim_whitespace=True,
                          usecols=self.used_col, names=self.names, header=0)
         df = df.loc[0::2].astype('int64')  # read every two rows
+        pd.to_datetime(df['TimeStamp'], unit='s')
+        df = df.set_index('TimeStamp')
         avg = df.iloc[:, 1:len(self.used_col)].mean(axis=0)
         return avg, df
 
@@ -51,9 +53,12 @@ class Mem(CommonBase):
         df = pd.read_csv(self.file_path, delim_whitespace=True,
                         usecols=self.used_col, names=self.names, header=0)
         df = df.loc[0::2].astype('int64')  # read every two rows
-        mask = (df['TimeStamp'] >= int(start)) & (df['TimeStamp'] <= int(end))
-        df = df.loc[mask].reset_index(drop=True)
+        # mask = (df['TimeStamp'] >= int(start)) & (df['TimeStamp'] <= int(end))
+        # df = df.loc[mask].reset_index(drop=True)
         avg = df.iloc[:, 1:len(self.used_col)].mean(axis=0)
+        pd.to_datetime(df['TimeStamp'], unit='s')
+        df = df.set_index('TimeStamp')
+        df = df.loc[start: end]
         return avg, df
 
     def used_col_num(self):

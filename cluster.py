@@ -118,7 +118,7 @@ class Cluster(Node):
                 return
             num_input = len(option)
             if num_input == 2:
-                attrib_avg = self.get_cluster_avg()
+                attrib_avg = self.get_cluster_avg(option[0], option[1])
                 start_time = datetime.fromtimestamp(option[0]).strftime('%Y-%m-%d %H:%M:%S')
                 end_time = datetime.fromtimestamp(option[1]).strftime('%Y-%m-%d %H:%M:%S')
                 f.write('All nodes average utilization between {0} and {1}:\n'.format(start_time, end_time))
@@ -144,6 +144,6 @@ if __name__ == '__main__':
     pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1'
     cluster = Cluster(pat_path)
     start = time.time()
-    cluster.save_avg_results(1487687766, 1487693339, 'POWER_TEST')
+    cluster.save_avg_results(1487687155, 1487687185)
     end = time.time()
     print 'Processing elapsed time: {0}'.format(end - start)
