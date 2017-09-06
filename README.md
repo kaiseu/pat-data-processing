@@ -23,7 +23,7 @@ tables 3.3.0
 
 
 
-Know Issue:
+Known Issue:
 
 ImportError: HDFStore requires PyTables, "Could not load any of ['hdf5.dll', 'hdf5dll.dll'], please ensure that it can be found in the system path" problem importing
 
