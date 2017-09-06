@@ -14,6 +14,7 @@
 import pandas as pd
 
 from component.base import CommonBase
+import numpy as np
 
 
 class Mem(CommonBase):
@@ -22,6 +23,7 @@ class Mem(CommonBase):
     """
     used_col = [0, 1, 13, 14, 16, 17]  # names = ['TimeStamp', 'kbmemfree', 'kbmemused', 'kbbuffers', 'kbcached']
     names = ['HostName', 'TimeStamp', 'kbmemfree', 'kbmemused', 'kbbuffers', 'kbcached']
+    converter = {col: np.int64 for col in names[2:]}
 
     def __init__(self, file_path):
         self.file_path = file_path
@@ -64,34 +66,35 @@ class Mem(CommonBase):
     def get_data_by_time(self, start, end):
         """
         get average value of this attribute and all raw data within the start and end timestamp.
-        if start and end all equal to 0 will calculate all the data.
+        if start and end all equal to [0] will calculate all the data.
         :param start: list of start timestamp
         :param end: list of end timestamp, should be the same length of start
-        :return: dict that contains avg value and all raw data of all the timestamp pair
+        :return: dict that contains avg value of all the timestamp pair and all raw data
         """
         df = pd.read_csv(self.file_path, delim_whitespace=True,
                          usecols=self.used_col, names=self.names, header=0)
         df = df.loc[0::2]  # read every two rows
         pd.to_datetime(df['TimeStamp'], unit='s')
-        df = df.set_index('TimeStamp')
-        avg = {}
-        raw_all = {}
-        if start == end == 0:  # calc all the data
-            raw_all[0] = df
-            avg[0] = df.iloc[:, 1:len(self.used_col)].astype('float32').mean(axis=0)
-            return avg, raw_all
+        df = df.set_index('TimeStamp').astype(self.converter)
+        avg = []
+        if start[0] == end[0] == 0:  # calc all the data
+            avg.append(df.iloc[:, 1:len(self.used_col)].mean(axis=0).astype('float32'))
+            if len(start) == 1:
+                return avg, df
+            else:
+                for i in range(1, len(start)):  # calc the data within the pair of time period
+                    avg.append(df.loc[str(start[i]): str(end[i])].iloc[:, 1:len(self.used_col)].mean(axis=0))
+                return avg, df
 
         for i in range(len(start)):  # calc the data within the pair of time period
-            raw_all[i] = df.loc[str(start[i]): str(end[i])]
-            avg[i] = raw_all[i].iloc[:, 1:len(self.used_col)].astype('float32').mean(axis=0)
-        return avg, raw_all
-
+            avg.append(df.loc[str(start[i]): str(end[i]), self.names[2:]].mean(axis=0).astype('float32'))
+        return avg, df
 
     def used_col_num(self):
         return len(self.__used_col)
 
 if __name__ == '__main__':
     mem = Mem('C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1\\instruments\\hsx-node1\\memstat')
-    avg, all_raw = mem.get_data_by_time(0,0)
+    avg, all_raw = mem.get_data_by_time([1487687161, 1487687176], [1487687170, 1487687185])
     print avg
     print all_raw

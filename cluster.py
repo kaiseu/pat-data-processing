@@ -19,6 +19,7 @@ import pandas as pd
 
 from node import Node
 from utils.commonOps import get_paths
+import numpy as np
 
 
 class Cluster(Node):
@@ -54,49 +55,22 @@ class Cluster(Node):
         :return: average attribute
         """
         cluster_avg = {}
-        cluster_all = {}
-        tmp_avg = {}
-        tmp_all = {}
         for attrib in self.attrib:
-            cluster_avg = pd.DataFrame()
-            cluster_all = pd.DataFrame()
-            # for i in range(len(start)):
-            tmp_avg = {'cpu': []}
-            tmp_all = {'cpu': {}}
-            # tmp_all[attrib] = {}
-
-            # aaa = zip(Node(node).get_attrib_data_by_time(attrib, start, end) for node in self.nodes)
-            # print aaa
+            tmp_avg = pd.DataFrame()
+            tmp_all = pd.DataFrame()
+            raw_path = self.pat_path + os.sep + attrib + '.h5'
             for node in self.nodes:
                 tmp = Node(node).get_attrib_data_by_time(attrib, start, end)
+                tmp_avg = tmp_avg.append(tmp[0])
+                tmp_all = tmp_all.append(tmp[1])
 
-                print tmp[0]
-                # for i in range(len(start)):
-                tmp_avg[attrib].append((tmp[0]))
-                    # print tmp[0][i]
-                print '*' *100
-                print tmp_avg
-            print tmp_avg
-                    # tmp_all[attrib].append(tmp[1][i], ignore_index=True)
-                    # tmp_avg = tmp_avg.append(tmp[0][i], ignore_index=True)
-                    # tmp_all = tmp_all.append(tmp[1][i], ignore_index=True)
-                # print tmp_avg
-                # print tmp_all
+            avg = pd.DataFrame()
+            for i in range(len(start)):
+                avg = avg.append(tmp_avg.loc[i].mean(axis=0), ignore_index=True)
+            cluster_avg[attrib] = avg
 
-                    # disk_avg.mean(axis=0)
-
-                    # for i in range(len(start)):
-                    # cluster_avg = cluster_avg.append(tmp_avg[i], ignore_index=True)
-                    # print cluster_avg
-                # tmp_avg = [(Node(node).get_attrib_data_by_time(attrib, start, end))[0][i] for node in self.nodes]
-                # attrib_all = pd.concat(tmp_avg, axis=1).transpose()
-                # attrib_avg[attrib] = pd.DataFrame(attrib_all.mean()).transpose()
-
-                # tmp_all = [(Node(node).get_attrib_data_by_time(attrib, start, end))[1][i] for node in self.nodes]
-        # return attrib_avg
-        # else:
-        #     print 'Optional inputs must be (start_timestamp, end_timestamp)'
-        #     exit(-1)
+            tmp_all.to_hdf(raw_path, 'key_to_store', table=True)
+        return cluster_avg
 
     def print_cluster_avg(self, *option):
         """
@@ -168,9 +142,9 @@ if __name__ == '__main__':
     """
     test only
     """
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_spark163_1TB_r1'
+    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
     cluster = Cluster(pat_path)
     start = time.time()
-    cluster.get_cluster_data_by_time([1487687161, 1487687176], [1487687170, 1487687185])
+    print cluster.get_cluster_data_by_time([1502436983], [1502552279])
     end = time.time()
     print 'Processing elapsed time: {0}'.format(end - start)

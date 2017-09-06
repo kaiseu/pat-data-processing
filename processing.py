@@ -37,6 +37,12 @@ def env_check():
         print '---- missing dependency: numpy or pandas, please install first'
         exit(-1)
 
+    try:
+        import tables  # noqa
+    except ImportError as ex:  # pragma: no cover
+        raise ImportError('HDFStore requires PyTables, "{ex}" problem '
+                          'importing'.format(ex=str(ex)))
+
     print '---- You have all required dependencies, starting to process'
 
 
