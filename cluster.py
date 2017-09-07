@@ -19,7 +19,6 @@ import pandas as pd
 
 from node import Node
 from utils.commonOps import get_paths
-import numpy as np
 
 
 class Cluster(Node):
@@ -48,7 +47,7 @@ class Cluster(Node):
             print 'Path: {0} does not exist, will exit...'.format(self.pat_path)
             exit(-1)
 
-    def get_cluster_data_by_time(self, start, end):
+    def get_cluster_data_by_time(self, start, end, save_raw):
         """
         Get average value of each attribute of all the nodes in the cluster
         :param option: Optional inputs must be (start_timestamp, end_timestamp), if is None will calculate the whole 
@@ -62,15 +61,33 @@ class Cluster(Node):
             for node in self.nodes:
                 tmp = Node(node).get_attrib_data_by_time(attrib, start, end)
                 tmp_avg = tmp_avg.append(tmp[0])
-                tmp_all = tmp_all.append(tmp[1])
-
+                # tmp_all = tmp_all.append(tmp[1])
+                if save_raw:
+                    tmp[1].to_hdf(raw_path, attrib, format='table', append=True)
             avg = pd.DataFrame()
             for i in range(len(start)):
                 avg = avg.append(tmp_avg.loc[i].mean(axis=0), ignore_index=True)
             cluster_avg[attrib] = avg
 
-            tmp_all.to_hdf(raw_path, 'key_to_store', table=True)
+            # tmp_all.to_hdf(raw_path, 'key_to_store', table=True)
+        result_path = self.pat_path + os.sep + 'results.txt'
+        print cluster_avg
+        self.save_result(cluster_avg, result_path)
         return cluster_avg
+
+    def save_result(self, result, result_path):
+        """
+        save results to file
+        :param result: dict that contains all the average result
+        :param result_path: file path that intended to save result, default is in the input PAT dir
+        :return: 
+        """
+        for key, value in result.items():
+            with open(result_path, 'a') as f:
+                f.write('*' * 110 + '\n')
+                f.write('Average {0} utilization: \n {1} \n'
+                        .format(key, value.to_string(index=False)))
+                f.write('*' * 110 + '\n')
 
     def print_cluster_avg(self, *option):
         """
@@ -143,8 +160,12 @@ if __name__ == '__main__':
     test only
     """
     pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
+    # pat_path = 'C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1'
     cluster = Cluster(pat_path)
     start = time.time()
-    print cluster.get_cluster_data_by_time([1502436983], [1502552279])
+    print cluster.get_cluster_data_by_time([0, 1487687161, 1487687176], [0, 1487687170, 1487687185], False)
     end = time.time()
     print 'Processing elapsed time: {0}'.format(end - start)
+
+    # df = pd.read_hdf('C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\cpu.h5', 'cpu')
+    # print df

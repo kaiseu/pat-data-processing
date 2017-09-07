@@ -11,11 +11,10 @@
 
 """
 
+import numpy as np
 import pandas as pd
 
 from component import base
-from datetime import datetime
-import numpy as np
 
 
 class Cpu(base.CommonBase):
@@ -91,6 +90,8 @@ class Cpu(base.CommonBase):
 
     def used_col_num(self):
         return len(self.__used_col)
+
+
 if __name__ == '__main__':
     cpu = Cpu('C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1\\instruments\\hsx-node1\\cpustat')
     avg, all_raw = cpu.get_data_by_time([0, 1487687161, 1487687176], [0, 1487687170, 1487687185])

@@ -11,10 +11,10 @@
 
 """
 
+import numpy as np
 import pandas as pd
 
 from component.base import CommonBase
-import numpy as np
 
 
 class Mem(CommonBase):

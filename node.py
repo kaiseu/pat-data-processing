@@ -82,8 +82,6 @@ class Node:
             if os.path.isfile(attrib_file):
                 AttribFactory.create_attrib(attrib, attrib_file).get_data_by_time(start, end)
 
-
-
     def get_node_avg(self):
         """
         Get node's all the exist attributes' average value
@@ -93,6 +91,7 @@ class Node:
         for attrib in self.node_exist_attrib():
             attrib_sum.append(self.get_avg_attrib(attrib))
         return attrib_sum
+
 
 if __name__ == '__main__':
     node = Node('C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1\\instruments\\hsx-node1\\')

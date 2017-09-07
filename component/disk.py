@@ -11,11 +11,10 @@
 
 """
 
+import numpy as np
 import pandas as pd
 
 from component.base import CommonBase
-from  datetime import datetime
-import numpy as np
 
 
 class Disk(CommonBase):
@@ -33,7 +32,8 @@ class Disk(CommonBase):
         get average value of this attribute and all value
         :return: each disk averaged and sum all the disks, all value
         """
-        df = pd.read_csv(self.file_path, delim_whitespace=True, usecols=self.used_col, header=0, converters=self.converter)
+        df = pd.read_csv(self.file_path, delim_whitespace=True, usecols=self.used_col, header=0,
+                         converters=self.converter)
         all_row = list(df['TimeStamp'].str.contains('TimeStamp'))
         # all the number of disks collected which is equal to the index of first 'True' in the list
         num_disks = all_row.index(True)
@@ -117,7 +117,7 @@ class Disk(CommonBase):
             disk_avg = pd.DataFrame()
             for num in range(num_disks):  # processing each disk
                 disk_data = df.iloc[num:len(all_row):num_disks].reset_index(
-                        drop=True)  # every $num_disks is for the same disk
+                    drop=True)  # every $num_disks is for the same disk
                 tmp = disk_data.iloc[:, 2:].mean(axis=0)  # average of each disks
                 disk_avg = disk_avg.append(tmp, ignore_index=True)
             avg.append(disk_avg.mean(axis=0))  # average value
@@ -140,11 +140,12 @@ class Disk(CommonBase):
             disk_avg = pd.DataFrame()
             for num in range(num_disks):  # processing each disk
                 disk_data = df.loc[str(start[i]): str(end[i])].iloc[num:len(all_row):num_disks].reset_index(
-                        drop=True)  # every $num_disks is for the same disk
+                    drop=True)  # every $num_disks is for the same disk
                 tmp = disk_data.iloc[:, 2:].astype('float32').mean(axis=0)  # average of each disks
                 disk_avg = disk_avg.append(tmp, ignore_index=True)
             avg.append(disk_avg.mean(axis=0))  # average value
         return avg, df
+
 
 if __name__ == '__main__':
     disk = Disk('C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1\\instruments\\hsx-node1\\iostat')

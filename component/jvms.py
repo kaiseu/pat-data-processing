@@ -11,10 +11,10 @@
 
 """
 
+import numpy as np
 import pandas as pd
 
 from component.base import CommonBase
-import numpy as np
 
 
 class Jvms(CommonBase):
@@ -26,4 +26,4 @@ class Jvms(CommonBase):
         pass
 
     def get_data_by_time(self, start, end):
-        return [pd.DataFrame(np.zeros((3,3)))], pd.DataFrame(np.zeros((3,3)))
+        return [pd.DataFrame(np.zeros((3, 3)))], pd.DataFrame(np.zeros((3, 3)))
