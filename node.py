@@ -37,25 +37,6 @@ class Node:
             exist_attrib.append(AttribFactory().get_attrib(names))
         return sorted(exist_attrib)
 
-    def get_avg_attrib(self, attrib):
-        """
-        Get average value of a given attribute
-        :param attrib: input attribute
-        :return: average value of the given attribute
-        """
-        if attrib.lower() in AttribFactory.node_attrib.keys():
-            attrib_file = self.file_path + os.sep + AttribFactory.node_attrib[attrib.lower()]
-            if os.path.isfile(attrib_file):
-                # print attrib_file
-                return AttribFactory.create_attrib(attrib, attrib_file).get_data()[0]
-            else:
-                print 'node does not have attribute {0}'.format(attrib)
-                exit(-1)
-        else:
-            print 'Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
-                .format(attrib, AttribFactory.node_attrib.keys())
-            exit(-1)
-
     def get_attrib_data_by_time(self, attrib, start, end):
         """
         Get data of a given attribute within a given time period
@@ -75,22 +56,6 @@ class Node:
             print 'Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
                 .format(attrib, AttribFactory.node_attrib.keys())
             exit(-1)
-
-    def get_data_by_time(self, start, end):
-        for attrib in self.attrib:
-            attrib_file = self.file_path + os.sep + AttribFactory.node_attrib[attrib.lower()]
-            if os.path.isfile(attrib_file):
-                AttribFactory.create_attrib(attrib, attrib_file).get_data_by_time(start, end)
-
-    def get_node_avg(self):
-        """
-        Get node's all the exist attributes' average value
-        :return: average value
-        """
-        attrib_sum = []
-        for attrib in self.node_exist_attrib():
-            attrib_sum.append(self.get_avg_attrib(attrib))
-        return attrib_sum
 
 
 if __name__ == '__main__':

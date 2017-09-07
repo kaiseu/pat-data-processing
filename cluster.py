@@ -50,8 +50,10 @@ class Cluster(Node):
     def get_cluster_data_by_time(self, start, end, save_raw):
         """
         Get average value of each attribute of all the nodes in the cluster
-        :param option: Optional inputs must be (start_timestamp, end_timestamp), if is None will calculate the whole 
-        :return: average attribute
+        :param start: list of start timestamp
+        :param end: list of end timestamp, should be the same length of start
+        :param save_raw: Boolean, whether to save all raw data
+        :return: all nodes average value within the given time pair
         """
         cluster_avg = {}
         for attrib in self.attrib:

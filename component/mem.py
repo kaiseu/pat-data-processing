@@ -28,41 +28,6 @@ class Mem(CommonBase):
     def __init__(self, file_path):
         self.file_path = file_path
 
-    def get_data(self):
-        """
-        get average value of this attribute and all value align with timestamp 
-        :return: average value, all value
-        """
-        # df = pd.read_csv(self.file_path, delim_whitespace=True,
-        #                  skiprows=(lambda i: i % 2 == 0), usecols=self.used_col, names=self.names)
-        df = pd.read_csv(self.file_path, delim_whitespace=True,
-                         usecols=self.used_col, names=self.names, header=0)
-        df = df.loc[0::2].astype('int64')  # read every two rows
-        pd.to_datetime(df['TimeStamp'], unit='s')
-        df = df.set_index('TimeStamp')
-        avg = df.iloc[:, 1:len(self.used_col)].mean(axis=0)
-        return avg, df
-
-    # def get_data_by_time(self, start, end):
-    #     """
-    #     get average value of this attribute and all value within the start and end timestamp
-    #     :param start: start timestamp
-    #     :param end: end timestamp
-    #     :return: average value, all value within the given timestamp
-    #     """
-    #     # df = pd.read_csv(self.file_path, delim_whitespace=True,
-    #     #                  skiprows=(lambda i: i % 2 == 0), usecols=self.used_col, names=self.names)
-    #     df = pd.read_csv(self.file_path, delim_whitespace=True,
-    #                     usecols=self.used_col, names=self.names, header=0)
-    #     df = df.loc[0::2].astype('int64')  # read every two rows
-    #     # mask = (df['TimeStamp'] >= int(start)) & (df['TimeStamp'] <= int(end))
-    #     # df = df.loc[mask].reset_index(drop=True)
-    #     avg = df.iloc[:, 1:len(self.used_col)].mean(axis=0)
-    #     pd.to_datetime(df['TimeStamp'], unit='s')
-    #     df = df.set_index('TimeStamp')
-    #     df = df.loc[start: end]
-    #     return avg, df
-
     def get_data_by_time(self, start, end):
         """
         get average value of this attribute and all raw data within the start and end timestamp.
@@ -92,6 +57,7 @@ class Mem(CommonBase):
 
     def used_col_num(self):
         return len(self.__used_col)
+
 
 if __name__ == '__main__':
     mem = Mem('C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1\\instruments\\hsx-node1\\memstat')
