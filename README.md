@@ -18,3 +18,14 @@ The result which contains the average System resource utilization(CPU, Memory, D
 Depedencies: 
 Python 2.7+
 Numpy
+tables 3.3.0
+
+
+
+
+Known Issue:
+
+ImportError: HDFStore requires PyTables, "Could not load any of ['hdf5.dll', 'hdf5dll.dll'], please ensure that it can be found in the system path" problem importing
+
+Turns out tables module 3.4.2 has some compatibility problems. Downgrade tables module to 3.3.0 solves this problem.
+ $ pip install tables==3.3.0
