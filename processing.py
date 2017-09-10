@@ -14,9 +14,10 @@
 import argparse
 import os
 import sys
-from datetime import datetime
-import pandas as pd
 import time
+from datetime import datetime
+
+import pandas as pd
 
 from bb_parse import BBParse
 from cluster import Cluster
@@ -142,8 +143,8 @@ def run():
             end_stamps = []
             for key, value in phase_ts.items():
                 item_num[key] = value.shape[0]
-                start_stamps.extend(map(int, (value['epochStartTimestamp']/1000).tolist()))
-                end_stamps.extend(map(int, (value['epochEndTimestamp']/1000).tolist()))
+                start_stamps.extend(map(int, (value['epochStartTimestamp'] / 1000).tolist()))
+                end_stamps.extend(map(int, (value['epochEndTimestamp'] / 1000).tolist()))
             assert len(start_stamps) == len(end_stamps)
             cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
             bb_result = pd.concat(phase_ts.values(), axis=0).reset_index(drop=True)
@@ -172,8 +173,8 @@ def save_result(cluster_avg, item_num, result_path):
                     .format(key, value.to_string(index=False)))
             f.write('*' * 100 + '\n')
 
+
 if __name__ == '__main__':
-    print get_args()
     start = time.time()
     run()
     end = time.time()
