@@ -14,6 +14,7 @@
 import os
 
 import pandas as pd
+from collections import OrderedDict
 
 
 class BBParse:
@@ -91,6 +92,48 @@ class BBParse:
             print 'phase name must be assigned! phase name only includes: {0}'.format(self.phase_name)
             exit(-1)
 
-# if __name__ == '__main__':
-#     bb_phase = BBPhase('C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_spark163_1TB_r1')
-#     bb_phase.get_stamp_by_phase('POWER_TEST')
+    def get_exist_phase_timestamp(self):
+        """
+        Parse TPCx-BB  each phase's timestamps from TPCx-BB log file BigBenchTimes.csv. 
+        For POWER_TEST each query will included, for THROUGHPUT_TEST_1, each stream will included
+        :return: dict that contains start and end timestamps of each phase
+        """
+        csv_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchTimes.csv'
+        if not os.path.isfile(csv_path):
+            print 'BigBenchTimes.csv does not exist in {0}, existing...'.format(self.bb_log_path)
+            exit(-1)
+        df = pd.read_csv(csv_path, delimiter=';').loc[:,
+             ['benchmarkPhase', 'streamNumber', 'queryNumber', 'epochStartTimestamp', 'epochEndTimestamp']]
+        phase_ts = OrderedDict()
+        is_exist = False
+        for phase in self.phase_name:
+            benchmark_phase = (df['benchmarkPhase'] == phase)
+            if any(benchmark_phase):  # whether this phase exist in the BB logs
+                if phase == 'POWER_TEST':  # power test overall and each query
+                    stream_num = ((df['streamNumber']) == 0)
+                    mask = benchmark_phase & stream_num
+                    phase_ts[phase] = df[mask].reset_index(drop=True)
+                elif phase == 'THROUGHPUT_TEST_1':  # throughput test overall and each stream
+                    query_num = (pd.isnull(df['queryNumber']))
+                    mask = benchmark_phase & query_num
+                    phase_ts[phase] = df[mask].reset_index(drop=True)
+                else:  # other phases
+                    stream_num = (pd.isnull(df['streamNumber']))
+                    query_num = (pd.isnull(df['queryNumber']))
+                    mask = benchmark_phase & stream_num & query_num
+                    # phase_start = line['epochStartTimestamp'].values / 1000
+                    # phase_end = line['epochEndTimestamp'].values / 1000
+                    phase_ts[phase] = df[mask].reset_index(drop=True)
+                is_exist = True
+        if is_exist:
+            return phase_ts
+        else:
+            print 'It seems BigBenchTimes.csv in {0} does not include any TPCx-BB phases, ' \
+                  'existing...'.format(self.bb_log_path)
+            exit(-1)
+
+
+if __name__ == '__main__':
+    bb_parse = BBParse('C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1')
+    phase_ts = bb_parse.get_exist_phase_timestamp()
+    print phase_ts

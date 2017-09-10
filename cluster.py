@@ -47,7 +47,7 @@ class Cluster(Node):
             print 'Path: {0} does not exist, will exit...'.format(self.pat_path)
             exit(-1)
 
-    def get_cluster_data_by_time(self, start, end, save_raw):
+    def get_cluster_data_by_time(self, start, end, save_raw=False):
         """
         Get average value of each attribute of all the nodes in the cluster
         :param start: list of start timestamp
@@ -72,9 +72,9 @@ class Cluster(Node):
             cluster_avg[attrib] = avg
 
             # tmp_all.to_hdf(raw_path, 'key_to_store', table=True)
-        result_path = self.pat_path + os.sep + 'results.txt'
+        # result_path = self.pat_path + os.sep + 'results.txt'
         print cluster_avg
-        self.save_result(cluster_avg, result_path)
+        # self.save_result(cluster_avg, result_path)
         return cluster_avg
 
     def save_result(self, result, result_path):
@@ -84,12 +84,12 @@ class Cluster(Node):
         :param result_path: file path that intended to save result, default is in the input PAT dir
         :return: 
         """
-        for key, value in result.items():
-            with open(result_path, 'a') as f:
-                f.write('*' * 110 + '\n')
+        with open(result_path, 'a') as f:
+            for key, value in result.items():
+                f.write('*' * 100 + '\n')
                 f.write('Average {0} utilization: \n {1} \n'
                         .format(key, value.to_string(index=False)))
-                f.write('*' * 110 + '\n')
+                f.write('*' * 100 + '\n')
 
     def print_cluster_avg(self, *option):
         """
@@ -161,11 +161,11 @@ if __name__ == '__main__':
     """
     test only
     """
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
-    # pat_path = 'C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1'
+    # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
+    pat_path = 'C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1'
     cluster = Cluster(pat_path)
     start = time.time()
-    print cluster.get_cluster_data_by_time([0, 1487687161, 1487687176], [0, 1487687170, 1487687185], False)
+    print cluster.get_cluster_data_by_time([0, 1502436983, 1502436983], [0, 1502552279, 1502552279], False)
     end = time.time()
     print 'Processing elapsed time: {0}'.format(end - start)
 
