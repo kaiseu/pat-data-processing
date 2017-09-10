@@ -12,9 +12,9 @@
 """
 
 import os
+from collections import OrderedDict
 
 import pandas as pd
-from collections import OrderedDict
 
 
 class BBParse:
@@ -102,6 +102,7 @@ class BBParse:
         if not os.path.isfile(csv_path):
             print 'BigBenchTimes.csv does not exist in {0}, existing...'.format(self.bb_log_path)
             exit(-1)
+        converter = {'benchmarkPhase': str, 'streamNumber': int, 'queryNumber': int, 'epochStartTimestamp': 'int64', 'epochEndTimestamp': 'int64'}
         df = pd.read_csv(csv_path, delimiter=';').loc[:,
              ['benchmarkPhase', 'streamNumber', 'queryNumber', 'epochStartTimestamp', 'epochEndTimestamp']]
         phase_ts = OrderedDict()
@@ -113,10 +114,13 @@ class BBParse:
                     stream_num = ((df['streamNumber']) == 0)
                     mask = benchmark_phase & stream_num
                     phase_ts[phase] = df[mask].reset_index(drop=True)
+                    phase_ts[phase].iloc[0, 2] = 0  # file 0 to blank value
                 elif phase == 'THROUGHPUT_TEST_1':  # throughput test overall and each stream
                     query_num = (pd.isnull(df['queryNumber']))
                     mask = benchmark_phase & query_num
                     phase_ts[phase] = df[mask].reset_index(drop=True)
+                    phase_ts[phase].iloc[0, 1:3] = -1  # file -1 to overall throughput test
+                    phase_ts[phase].iloc[1:, 2] = 0  # file 0 to blank value
                 else:  # other phases
                     stream_num = (pd.isnull(df['streamNumber']))
                     query_num = (pd.isnull(df['queryNumber']))
@@ -124,6 +128,7 @@ class BBParse:
                     # phase_start = line['epochStartTimestamp'].values / 1000
                     # phase_end = line['epochEndTimestamp'].values / 1000
                     phase_ts[phase] = df[mask].reset_index(drop=True)
+                    phase_ts[phase].iloc[0, 1:3] = 0  # file 0 to blank value
                 is_exist = True
         if is_exist:
             return phase_ts
@@ -134,6 +139,7 @@ class BBParse:
 
 
 if __name__ == '__main__':
-    bb_parse = BBParse('C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1')
+    bb_parse = BBParse(
+        'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1')
     phase_ts = bb_parse.get_exist_phase_timestamp()
     print phase_ts

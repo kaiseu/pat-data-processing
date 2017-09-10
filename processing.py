@@ -11,10 +11,12 @@
 
 """
 
+import argparse
 import os
 import sys
-import time
 from datetime import datetime
+import pandas as pd
+import time
 
 from bb_parse import BBParse
 from cluster import Cluster
@@ -55,7 +57,7 @@ def save_avg_result(*option):
     """
     if len(option) == 1:  # only pat_path is assigned
         result_file = option[0] + os.sep + 'results.txt'
-        attrib_avg = Cluster(option[0]).get_cluster_avg()
+        attrib_avg = Cluster(option[0]).get_cluster_data_by_time([0], [0], False)
         with open(result_file, 'w') as f:
             f.write('*' * 110 + '\n')
             f.write('All nodes average utilization\n')
@@ -109,27 +111,96 @@ def save_avg_result(*option):
         exit(-1)
 
 
-if __name__ == '__main__':
-    env_check()
-    if len(sys.argv) == 2:  # only pat_path is assigned
-        tic = time.time()
-        save_avg_result(sys.argv[1])
-        toc = time.time()
-        print 'Processing elapsed time: {0}'.format(toc - tic)
-    elif len(sys.argv) == 3:
-        tic = time.time()
-        save_avg_result(*sys.argv[1:3])
-        toc = time.time()
-        print 'Processing elapsed time: {0}'.format(toc - tic)
-    elif len(sys.argv) == 4:
-        tic = time.time()
-        save_avg_result(*sys.argv[1:4])
-        toc = time.time()
-        print 'Processing elapsed time: {0}'.format(toc - tic)
+def get_args():
+    parse = argparse.ArgumentParser(description='Processing PAT data')
+    parse.add_argument('-p', '--pat', type=str, help='PAT file path', required=True)
+    parse.add_argument('-l', '--log', type=str, help='TPCx-BB log path', required=False)
+    parse.add_argument('-ph', '--phase', type=str, help='TPCx-BB phase', required=False, nargs='+', default='BENCHMARK')
+    parse.add_argument('-q', '--query', type=int, help='TPCx-BB query num', required=False, nargs='+')
+    parse.add_argument('-s', '--save', type=bool, help='whether to save raw data', required=False, default=False)
+
+    args = parse.parse_args()
+    pat_path = args.pat
+    log_path = args.log
+    phase = args.phase
+    query = args.query
+    save_raw = args.save
+    save_raw = False
+    return pat_path, log_path, phase, query, save_raw
+
+
+def run():
+    pat_path, log_path, phase, query, save_raw = get_args()
+    if os.path.exists(pat_path):
+        if not log_path:  # only pat is assigned
+            cluster_avg = Cluster(pat_path).get_cluster_data_by_time([0], [0], save_raw)
+            print cluster_avg
+        else:
+            phase_ts = BBParse(log_path).get_exist_phase_timestamp()
+            item_num = {}
+            start_stamps = []
+            end_stamps = []
+            for key, value in phase_ts.items():
+                item_num[key] = value.shape[0]
+                start_stamps.extend(map(int, (value['epochStartTimestamp']/1000).tolist()))
+                end_stamps.extend(map(int, (value['epochEndTimestamp']/1000).tolist()))
+            assert len(start_stamps) == len(end_stamps)
+            cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+            bb_result = pd.concat(phase_ts.values(), axis=0).reset_index(drop=True)
+            result = pd.concat(cluster_avg.values(), axis=1)
+            # print result
+            avg_result = pd.concat([bb_result, result], axis=1)
+            result_path = pat_path + os.sep + 'results.txt'
+            avg_result.to_csv(result_path, sep=',')
+            print avg_result
+
     else:
-        print 'Usage: python processing.py $pat_path or python processing.py ' \
-              '$pat_path $bb_log_path or python processing.py $pat_path $bb_log_path $BB_Phase\n'
+        print 'PAT file path: {0} does not exist, exiting...'.format(pat_path)
         exit(-1)
 
-        # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
-        # bb_log_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
+
+def save_result(cluster_avg, item_num, result_path):
+    with open(result_path, 'a') as f:
+        for key, value in item_num.items():
+            f.write('*' * 100 + '\n')
+            f.write('Average {0} utilization: \n {1} \n'.format(key))
+
+        for key, value in cluster_avg.items():
+            f.write('*' * 100 + '\n')
+
+            f.write('Average {0} utilization: \n {1} \n'
+                    .format(key, value.to_string(index=False)))
+            f.write('*' * 100 + '\n')
+
+if __name__ == '__main__':
+    print get_args()
+    start = time.time()
+    run()
+    end = time.time()
+    print 'Processing elapsed time: {0}'.format(end - start)
+
+#
+# if __name__ == '__main__':
+#     env_check()
+#     if len(sys.argv) == 2:  # only pat_path is assigned
+#         tic = time.time()
+#         save_avg_result(sys.argv[1])
+#         toc = time.time()
+#         print 'Processing elapsed time: {0}'.format(toc - tic)
+#     elif len(sys.argv) == 3:
+#         tic = time.time()
+#         save_avg_result(*sys.argv[1:3])
+#         toc = time.time()
+#         print 'Processing elapsed time: {0}'.format(toc - tic)
+#     elif len(sys.argv) == 4:
+#         tic = time.time()
+#         save_avg_result(*sys.argv[1:4])
+#         toc = time.time()
+#         print 'Processing elapsed time: {0}'.format(toc - tic)
+#     else:
+#         print 'Usage: python processing.py $pat_path or python processing.py ' \
+#               '$pat_path $bb_log_path or python processing.py $pat_path $bb_log_path $BB_Phase\n'
+#         exit(-1)
+
+# pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
+# bb_log_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'

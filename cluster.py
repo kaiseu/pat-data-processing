@@ -73,7 +73,7 @@ class Cluster(Node):
 
             # tmp_all.to_hdf(raw_path, 'key_to_store', table=True)
         # result_path = self.pat_path + os.sep + 'results.txt'
-        print cluster_avg
+        # print cluster_avg
         # self.save_result(cluster_avg, result_path)
         return cluster_avg
 
