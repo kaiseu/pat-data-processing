@@ -131,29 +131,40 @@ def get_args():
 
 
 def run():
+    env_check()
     pat_path, log_path, phase, query, save_raw = get_args()
     if os.path.exists(pat_path):
-        if not log_path:  # only pat is assigned
+        if not log_path:  # only pat_path is assigned
+            print 'only pat_path is assigned, calculating BENCHMARK average utilization...\n'
             cluster_avg = Cluster(pat_path).get_cluster_data_by_time([0], [0], save_raw)
             print cluster_avg
-        else:
-            phase_ts = BBParse(log_path).get_exist_phase_timestamp()
-            item_num = {}
+        else:  # pat_path and log_path are assigned
+            if os.path.exists(log_path):
+                phase_ts = BBParse(log_path).get_exist_phase_timestamp()
+            else:
+                print 'TPCx-BB log file path: {0} does not exist, exiting...'.format(log_path)
+                exit(-1)
+
             start_stamps = []
             end_stamps = []
-            for key, value in phase_ts.items():
-                item_num[key] = value.shape[0]
-                start_stamps.extend(map(int, (value['epochStartTimestamp'] / 1000).tolist()))
-                end_stamps.extend(map(int, (value['epochEndTimestamp'] / 1000).tolist()))
-            assert len(start_stamps) == len(end_stamps)
-            cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
-            bb_result = pd.concat(phase_ts.values(), axis=0).reset_index(drop=True)
-            result = pd.concat(cluster_avg.values(), axis=1)
-            # print result
-            avg_result = pd.concat([bb_result, result], axis=1)
-            result_path = pat_path + os.sep + 'results.txt'
-            avg_result.to_csv(result_path, sep=',')
-            print avg_result
+            if (not phase) & (not query):
+                for key, value in phase_ts.items():
+                    start_stamps.extend(map(int, (value['epochStartTimestamp'] / 1000).tolist()))
+                    end_stamps.extend(map(int, (value['epochEndTimestamp'] / 1000).tolist()))
+                assert len(start_stamps) == len(end_stamps)
+                cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+                bb_result = pd.concat(phase_ts.values(), axis=0).reset_index(drop=True)
+                result = pd.concat(cluster_avg.values(), axis=1)
+                # print result
+                avg_result = pd.concat([bb_result, result], axis=1)
+                result_path = pat_path + os.sep + 'results.txt'
+                avg_result.to_csv(result_path, sep=',')
+                print avg_result
+            elif phase in phase_ts.keys():
+                start_stamps = map(int, (phase_ts[phase]['epochStartTimestamp'] / 1000).tolist())
+                end_stamps = map(int, (phase_ts[phase]['epochEndTimestamp'] / 1000).tolist())
+                cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+
 
     else:
         print 'PAT file path: {0} does not exist, exiting...'.format(pat_path)
