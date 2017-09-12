@@ -3,14 +3,23 @@ Processing and visualize PAT data
 
 Usage: 
 python processing.py -p $pat_path
+
 or 
+
 python processing.py -p $pat_path -l $bb_log_path
+
 or 
+
 python processing.py -p $pat_path -l $bb_log_path -ph $BB_Phase
+
 or
+
 python processing.py -p $pat_path -l $bb_log_path -n $streamNumber
+
 or
+
 python processing.py -p $pat_path -l $bb_log_path -q $query
+
 
 where:
 $pat_path: is the PAT raw data path
