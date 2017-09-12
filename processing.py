@@ -149,7 +149,7 @@ def run():
 
             start_stamps = []
             end_stamps = []
-            if (not phase) & (not query) & (not stream):  # if -ph and -q not assigned
+            if (not phase) & (not query) & (not stream):  # if -ph -q and -n not assigned
                 for key, value in phase_ts.items():
                     start_stamps.extend((value['epochStartTimestamp'] / 1000).tolist())
                     end_stamps.extend((value['epochEndTimestamp'] / 1000).tolist())
@@ -157,7 +157,6 @@ def run():
                 cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
                 bb_result = pd.concat(phase_ts.values(), axis=0).reset_index(drop=True)
                 pat_result = pd.concat(cluster_avg.values(), axis=1)
-                # print result
                 avg_result = pd.concat([bb_result, pat_result], axis=1)
                 result_path = pat_path + os.sep + 'results.txt'
                 avg_result.to_csv(result_path, sep=',')
@@ -180,7 +179,7 @@ def run():
                 end_stamps = map(int, (phase_ts['THROUGHPUT_TEST_1'].iloc[stream, 4] / 1000).tolist())
                 assert len(start_stamps) == len(end_stamps)
                 cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
-                tag = ['stream' + str(s-1) for s in stream]  # stream begin from 0
+                tag = ['stream' + str(s - 1) for s in stream]  # stream begin from 0
                 print_result(cluster_avg, tag)
             elif not stream:  # for query
                 exist_queries = phase_ts['POWER_TEST'].iloc[:, 2].tolist()
@@ -194,6 +193,9 @@ def run():
                 cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
                 tag = ['q' + str(q) for q in query]
                 print_result(cluster_avg, tag)
+            else:
+                print 'The input arguments is not supported, exiting...'
+                exit(-1)
     else:
         print 'PAT file path: {0} does not exist, exiting...'.format(pat_path)
         exit(-1)
@@ -214,6 +216,12 @@ def save_result(cluster_avg, item_num, result_path):
 
 
 def print_result(cluster_avg, tag):
+    """
+    print avg result
+    :param cluster_avg: dict that contains node avg attribute, e.g. CPU, Disk, Mem, Network
+    :param tag: tags for the output index, can be stream number: stream# or query number: q#
+    :return: None
+    """
     for key, value in cluster_avg.items():
         value = value.set_index([tag])
         print '*' * 70
@@ -227,29 +235,6 @@ if __name__ == '__main__':
     run()
     end = time.time()
     print 'Processing elapsed time: {0}'.format(end - start)
-
-#
-# if __name__ == '__main__':
-#     env_check()
-#     if len(sys.argv) == 2:  # only pat_path is assigned
-#         tic = time.time()
-#         save_avg_result(sys.argv[1])
-#         toc = time.time()
-#         print 'Processing elapsed time: {0}'.format(toc - tic)
-#     elif len(sys.argv) == 3:
-#         tic = time.time()
-#         save_avg_result(*sys.argv[1:3])
-#         toc = time.time()
-#         print 'Processing elapsed time: {0}'.format(toc - tic)
-#     elif len(sys.argv) == 4:
-#         tic = time.time()
-#         save_avg_result(*sys.argv[1:4])
-#         toc = time.time()
-#         print 'Processing elapsed time: {0}'.format(toc - tic)
-#     else:
-#         print 'Usage: python processing.py $pat_path or python processing.py ' \
-#               '$pat_path $bb_log_path or python processing.py $pat_path $bb_log_path $BB_Phase\n'
-#         exit(-1)
 
 # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
 # bb_log_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
