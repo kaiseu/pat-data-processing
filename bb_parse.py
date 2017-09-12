@@ -102,7 +102,8 @@ class BBParse:
         if not os.path.isfile(csv_path):
             print 'BigBenchTimes.csv does not exist in {0}, existing...'.format(self.bb_log_path)
             exit(-1)
-        converter = {'benchmarkPhase': str, 'streamNumber': int, 'queryNumber': int, 'epochStartTimestamp': 'int64', 'epochEndTimestamp': 'int64'}
+        converter = {'benchmarkPhase': str, 'streamNumber': int, 'queryNumber': int,
+                     'epochStartTimestamp': 'int64', 'epochEndTimestamp': 'int64'}
         df = pd.read_csv(csv_path, delimiter=';').loc[:,
              ['benchmarkPhase', 'streamNumber', 'queryNumber', 'epochStartTimestamp', 'epochEndTimestamp']]
         phase_ts = OrderedDict()
@@ -129,6 +130,7 @@ class BBParse:
                     # phase_end = line['epochEndTimestamp'].values / 1000
                     phase_ts[phase] = df[mask].reset_index(drop=True)
                     phase_ts[phase].iloc[0, 1:3] = 0  # file 0 to blank value
+                phase_ts[phase] = phase_ts[phase].astype(converter)
                 is_exist = True
         if is_exist:
             return phase_ts
@@ -140,6 +142,6 @@ class BBParse:
 
 if __name__ == '__main__':
     bb_parse = BBParse(
-        'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1')
+        'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_spark163_1TB_r1')
     phase_ts = bb_parse.get_exist_phase_timestamp()
     print phase_ts
