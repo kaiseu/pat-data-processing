@@ -163,7 +163,7 @@ def run():
 
             start_stamps = []
             end_stamps = []
-            if (not phase) & (not query) & (not stream):  # if -ph -q and -n not assigned
+            if (not query) & (not stream) & (phase == 'BENCHMARK'):  # if -ph -q and -n not assigned
                 for key, value in phase_ts.items():
                     start_stamps.extend((value['epochStartTimestamp'] / 1000).tolist())
                     end_stamps.extend((value['epochEndTimestamp'] / 1000).tolist())
@@ -174,14 +174,25 @@ def run():
                 avg_result = pd.concat([bb_result, pat_result], axis=1)
                 result_path = pat_path + os.sep + 'results.txt'
                 avg_result.to_csv(result_path, sep=',')
-                print avg_result
-            elif (not query) & (not stream) & (phase in phase_ts.keys()):  # for BB phase
-                start_stamps = map(int, (phase_ts[phase]['epochStartTimestamp'] / 1000).tolist())
-                end_stamps = map(int, (phase_ts[phase]['epochEndTimestamp'] / 1000).tolist())
+                tag = []
+                for key in phase_ts.keys():
+                    tag.append(key)
+                    if key == 'POWER_TEST':
+                        tag.extend(['q' + str(i) for i in phase_ts[key].iloc[1:, 2]])
+                    elif key == 'THROUGHPUT_TEST_1':
+                        tag.extend(['stream' + str(i) for i in phase_ts[key].iloc[1:, 1]])
+                print_result(cluster_avg, tag)
+                result_path = pat_path + os.sep + 'pat_avg_all.txt'
+                save_result(cluster_avg, tag, result_path)
+            elif (not query) & (not stream) & (set(phase).issubset(phase_ts.keys())):  # for BB phase
+                for ph in phase:
+                    start_stamps.append(int(phase_ts[ph].iloc[0, 3] / 1000))
+                    end_stamps.append(int(phase_ts[ph].iloc[0, 4] / 1000))
                 assert len(start_stamps) == len(end_stamps)
                 cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
-                tag = ['stream' + str(q) for q in query]
-                print_result(cluster_avg, tag)
+                print_result(cluster_avg, phase)
+                result_path = pat_path + os.sep + 'pat_avg.txt'
+                save_result(cluster_avg, phase, result_path)
             elif not query:  # for throughput streams
                 num_streams = phase_ts['THROUGHPUT_TEST_1'].shape[0] - 1  # num of throughput steams from the log
                 if any(s >= num_streams for s in stream):  # check if input streamNumber is right
@@ -246,7 +257,7 @@ def print_result(cluster_avg, tag):
     for key, value in cluster_avg.items():
         value = value.set_index([tag])
         print '*' * 70
-        print 'Average {0} utilization: \n {1} \n'.format(key, value)
+        print 'Average {0} utilization: \n {1} \n'.format(key, value),
     print '*' * 70 + '\n'
 
 
