@@ -112,14 +112,29 @@ def save_avg_result(*option):
         exit(-1)
 
 
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 def get_args():
+    """
+    Parse command line inputs
+    :return: 
+    """
     parse = argparse.ArgumentParser(description='Processing PAT data')
+    group = parse.add_mutually_exclusive_group()
+
     parse.add_argument('-p', '--pat', type=str, help='PAT file path', required=True)
     parse.add_argument('-l', '--log', type=str, help='TPCx-BB log path', required=False)
-    parse.add_argument('-ph', '--phase', type=str, help='TPCx-BB phase', required=False, nargs='+', default='BENCHMARK')
-    parse.add_argument('-q', '--query', type=int, help='TPCx-BB query num', required=False, nargs='+')
-    parse.add_argument('-n', '--streamNumber', type=int, help='TPCx-BB stream number', required=False, nargs='+')
-    parse.add_argument('-s', '--save', type=bool, help='whether to save raw data', required=False, default=False)
+    group.add_argument('-ph', '--phase', type=str, help='TPCx-BB phase', required=False, nargs='+', default='BENCHMARK')
+    group.add_argument('-q', '--query', type=int, help='TPCx-BB query num', required=False, nargs='+')
+    group.add_argument('-n', '--streamNumber', type=int, help='TPCx-BB stream number', required=False, nargs='+')
+    parse.add_argument('-s', '--save', type=str2bool, help='whether to save raw data', required=False, default=False)
 
     args = parse.parse_args()
     pat_path = args.pat
@@ -128,7 +143,6 @@ def get_args():
     stream = args.streamNumber
     query = args.query
     save_raw = args.save
-    save_raw = False
     return pat_path, log_path, phase, stream, query, save_raw
 
 
@@ -201,18 +215,13 @@ def run():
         exit(-1)
 
 
-def save_result(cluster_avg, item_num, result_path):
-    with open(result_path, 'a') as f:
-        for key, value in item_num.items():
-            f.write('*' * 100 + '\n')
-            f.write('Average {0} utilization: \n {1} \n'.format(key))
-
+def save_result(cluster_avg, tag, result_path):
+    with open(result_path, 'w') as f:
         for key, value in cluster_avg.items():
-            f.write('*' * 100 + '\n')
-
-            f.write('Average {0} utilization: \n {1} \n'
-                    .format(key, value.to_string(index=False)))
-            f.write('*' * 100 + '\n')
+            value = value.set_index([tag])
+            f.write('*' * 70)
+            f.write('Average {0} utilization: \n {1} \n'.format(key, value))
+        f.write('*' * 70 + '\n')
 
 
 def print_result(cluster_avg, tag):
@@ -230,7 +239,6 @@ def print_result(cluster_avg, tag):
 
 
 if __name__ == '__main__':
-    print get_args()
     start = time.time()
     run()
     end = time.time()
