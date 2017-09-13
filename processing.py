@@ -195,6 +195,8 @@ def run():
                 cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
                 tag = ['stream' + str(s - 1) for s in stream]  # stream begin from 0
                 print_result(cluster_avg, tag)
+                result_path = pat_path + os.sep + 'pat_avg.txt'
+                save_result(cluster_avg, tag, result_path)
             elif not stream:  # for query
                 exist_queries = phase_ts['POWER_TEST'].iloc[:, 2].tolist()
                 if not set(query).issubset(set(exist_queries)):  # check if input queries existing in the log
@@ -207,6 +209,8 @@ def run():
                 cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
                 tag = ['q' + str(q) for q in query]
                 print_result(cluster_avg, tag)
+                result_path = pat_path + os.sep + 'pat_avg.txt'
+                save_result(cluster_avg, tag, result_path)
             else:
                 print 'The input arguments is not supported, exiting...'
                 exit(-1)
@@ -216,12 +220,20 @@ def run():
 
 
 def save_result(cluster_avg, tag, result_path):
+    """
+    Save result to file
+    :param cluster_avg: cluster_avg: dict that contains node avg attribute, e.g. CPU, Disk, Mem, Network
+    :param tag: tags for the output index, can be stream number: stream# or query number: q#
+    :param result_path: result save path
+    :return: 
+    """
     with open(result_path, 'w') as f:
         for key, value in cluster_avg.items():
             value = value.set_index([tag])
-            f.write('*' * 70)
+            f.write('*' * 70 + '\n')
             f.write('Average {0} utilization: \n {1} \n'.format(key, value))
         f.write('*' * 70 + '\n')
+    print 'Results have been saved to {0}'.format(result_path)
 
 
 def print_result(cluster_avg, tag):
