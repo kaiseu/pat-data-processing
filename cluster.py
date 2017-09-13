@@ -65,13 +65,13 @@ class Cluster(Node):
                 tmp_avg = tmp_avg.append(tmp[0])
                 # tmp_all = tmp_all.append(tmp[1])
                 if save_raw:
-                    tmp[1].to_hdf(raw_path, attrib, format='table', append=True)
+                    tmp[1].to_hdf(raw_path, attrib, format='table', append=True, min_itemsize={'HostName': 20})
+                    # store = pd.HDFStore(raw_path).get_storer(attrib).table
             avg = pd.DataFrame()
             for i in range(len(start)):
                 avg = avg.append(tmp_avg.loc[i].mean(axis=0), ignore_index=True)
             cluster_avg[attrib] = avg
 
-            # tmp_all.to_hdf(raw_path, 'key_to_store', table=True)
         # result_path = self.pat_path + os.sep + 'results.txt'
         # print cluster_avg
         # self.save_result(cluster_avg, result_path)
