@@ -267,5 +267,7 @@ if __name__ == '__main__':
     end = time.time()
     print 'Processing elapsed time: {0}'.format(end - start)
 
+    # store = pd.HDFStore('C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\network.h5').get_storer('network').table
+    # print store
 # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
 # bb_log_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'

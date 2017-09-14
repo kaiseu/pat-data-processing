@@ -17,6 +17,7 @@ from datetime import datetime
 
 import pandas as pd
 
+from db import write_db
 from node import Node
 from utils.commonOps import get_paths
 
@@ -59,19 +60,18 @@ class Cluster(Node):
         for attrib in self.attrib:
             tmp_avg = pd.DataFrame()
             tmp_all = pd.DataFrame()
-            raw_path = self.pat_path + os.sep + attrib + '.h5'
+            raw_path = self.pat_path + os.sep + attrib + '.csv'
             for node in self.nodes:
                 tmp = Node(node).get_attrib_data_by_time(attrib, start, end)
                 tmp_avg = tmp_avg.append(tmp[0])
-                # tmp_all = tmp_all.append(tmp[1])
-                if save_raw:
-                    tmp[1].to_hdf(raw_path, attrib, format='table', append=True, min_itemsize={'HostName': 20})
-                    # store = pd.HDFStore(raw_path).get_storer(attrib).table
+                tmp_all = tmp_all.append(tmp[1])
+            if save_raw:
+                tmp_all.to_csv(raw_path, sep=',')
+
             avg = pd.DataFrame()
             for i in range(len(start)):
                 avg = avg.append(tmp_avg.loc[i].mean(axis=0), ignore_index=True)
             cluster_avg[attrib] = avg
-
         # result_path = self.pat_path + os.sep + 'results.txt'
         # print cluster_avg
         # self.save_result(cluster_avg, result_path)
