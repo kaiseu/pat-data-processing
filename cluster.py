@@ -14,12 +14,14 @@
 import os
 import time
 from datetime import datetime
+from multiprocessing import Pool, Process
 
 import pandas as pd
 
-from db import write_db
+from  component.factory import AttribFactory
 from node import Node
 from utils.commonOps import get_paths
+import sys
 
 
 class Cluster(Node):
@@ -64,10 +66,14 @@ class Cluster(Node):
             for node in self.nodes:
                 tmp = Node(node).get_attrib_data_by_time(attrib, start, end)
                 tmp_avg = tmp_avg.append(tmp[0])
-                tmp_all = tmp_all.append(tmp[1])
+                # tmp_all = tmp_all.append(tmp[1])
             if save_raw:
+                tmp_all.index = pd.to_datetime(tmp_all.index, unit='s')
                 tmp_all.to_csv(raw_path, sep=',')
 
+            # if save_raw:
+            #     tmp_all.index = pd.to_datetime(tmp_all.index, unit='s')
+            #     write_db.write_df(tmp_all, 'pat_avg_large', attrib)
             avg = pd.DataFrame()
             for i in range(len(start)):
                 avg = avg.append(tmp_avg.loc[i].mean(axis=0), ignore_index=True)
@@ -76,6 +82,37 @@ class Cluster(Node):
         # print cluster_avg
         # self.save_result(cluster_avg, result_path)
         return cluster_avg
+
+    def get_node_attrib_data_by_time(self, file_path, attrib, start, end):
+        """
+        Get data of a given attribute within a given time period
+        :param attrib: input attribute
+        :param start: list of start timestamp
+        :param end: list of end timestamp, should be the same length of start
+        :return: dict that contains avg value and all raw data of all the timestamp pair
+        """
+        if attrib.lower() in AttribFactory.node_attrib.keys():
+            attrib_file = file_path + os.sep + AttribFactory.node_attrib[attrib.lower()]
+            if os.path.isfile(attrib_file):
+                return AttribFactory.create_attrib(attrib, attrib_file).get_data_by_time(start, end)
+            else:
+                print 'node does not have attribute {0}'.format(attrib)
+                exit(-1)
+        else:
+            print 'Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
+                .format(attrib, AttribFactory.node_attrib.keys())
+            exit(-1)
+
+    def get_cluster_attrib_data(self, attrib, start, end):
+        pool = Pool(4)
+        pool.map(self.get_node_attrib_data_by_time())
+        tmp_avg = pd.DataFrame()
+        for node in self.nodes:
+            p = Process(target=self.get_node_attrib_data_by_time(), args=(node, attrib, start, end))
+            print p
+            # tmp_avg.append(p)
+            p.start()
+        print tmp_avg
 
     def save_result(self, result, result_path):
         """
@@ -162,10 +199,12 @@ if __name__ == '__main__':
     test only
     """
     # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
-    pat_path = 'C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1'
+    # pat_path = 'C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1'
+    pat_path = sys.argv[1]
     cluster = Cluster(pat_path)
     start = time.time()
-    print cluster.get_cluster_data_by_time([0, 1502436983, 1502436983], [0, 1502552279, 1502552279], False)
+    print cluster.get_cluster_data_by_time([0, 1505148392, 1505148392, 1505148392], [0, 1505272675, 1505272675, 1505272675], False)
+    # cluster.get_cluster_attrib_data('cpu', [0, 1487687161, 1487687176], [0, 1487687170, 1487687185])
     end = time.time()
     print 'Processing elapsed time: {0}'.format(end - start)
 

@@ -21,6 +21,8 @@ class Node:
     """
     Corresponding to a physical machine, each Node may have many attributes, nodes makes up Cluster
     """
+    def __init__(self):
+        pass
 
     def __init__(self, file_path):
         self.file_path = file_path
@@ -56,6 +58,7 @@ class Node:
             print 'Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
                 .format(attrib, AttribFactory.node_attrib.keys())
             exit(-1)
+
 
 
 if __name__ == '__main__':
