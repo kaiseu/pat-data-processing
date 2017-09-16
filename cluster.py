@@ -66,7 +66,7 @@ class Cluster(Node):
             for node in self.nodes:
                 tmp = Node(node).get_attrib_data_by_time(attrib, start, end)
                 tmp_avg = tmp_avg.append(tmp[0])
-                # tmp_all = tmp_all.append(tmp[1])
+                tmp_all = tmp_all.append(tmp[1])
             if save_raw:
                 tmp_all.index = pd.to_datetime(tmp_all.index, unit='s')
                 tmp_all.to_csv(raw_path, sep=',')

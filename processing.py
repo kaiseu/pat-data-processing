@@ -21,6 +21,7 @@ import pandas as pd
 
 from bb_parse import BBParse
 from cluster import Cluster
+from parallelprocessing import get_cluster_data_by_time
 
 
 def env_check():
@@ -168,7 +169,8 @@ def run():
                     start_stamps.extend((value['epochStartTimestamp'] / 1000).tolist())
                     end_stamps.extend((value['epochEndTimestamp'] / 1000).tolist())
                 assert len(start_stamps) == len(end_stamps)
-                cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+                # cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+                cluster_avg = get_cluster_data_by_time(pat_path, start_stamps, end_stamps, save_raw)
                 bb_result = pd.concat(phase_ts.values(), axis=0).reset_index(drop=True)
                 pat_result = pd.concat(cluster_avg.values(), axis=1)
                 avg_result = pd.concat([bb_result, pat_result], axis=1)

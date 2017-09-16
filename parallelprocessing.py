@@ -42,15 +42,15 @@ def get_node_attrib_data_by_time(attrib, start, end, file_path):
         exit(-1)
 
 
-def get_cluster_attrib_data(nodes, start, end, save_raw, attrib):
-    # pat_path = pat_path + os.sep + 'instruments'
-    # if os.path.exists(pat_path):
-    #     nodes = get_paths(pat_path)
-    # else:
-    #     print 'Path: {0} does not exist, will exit...'.format(pat_path)
-    #     exit(-1)
+def get_cluster_attrib_data(pat_path, start, end, save_raw, attrib):
+    pat_path = pat_path + os.sep + 'instruments'
+    if os.path.exists(pat_path):
+        nodes = get_paths(pat_path)
+    else:
+        print 'Path: {0} does not exist, will exit...'.format(pat_path)
+        exit(-1)
 
-    pool = Pool(9)
+    pool = Pool(4)
     func = partial(get_node_attrib_data_by_time, attrib, start, end)
     p = pool.map(func, nodes)
 
@@ -72,12 +72,15 @@ def get_cluster_attrib_data(nodes, start, end, save_raw, attrib):
     return avg
 
 
-def get_cluster_data_by_time(nodes, attrib, start, end, save_raw=False):
+def get_cluster_data_by_time(pat_path, start, end, save_raw):
+    cluster = Cluster(pat_path)
+    attrib = cluster.attrib
+    nodes = cluster.nodes
     cluster_avg = {}
 
     for attr in attrib:
-        cluster_avg[attr] = get_cluster_attrib_data(nodes, start, end, save_raw, attr)
-    print cluster_avg
+        cluster_avg[attr] = get_cluster_attrib_data(pat_path, start, end, save_raw, attr)
+    # print cluster_avg
     return cluster_avg
 
 
@@ -85,15 +88,13 @@ if __name__ == '__main__':
     # pat_path = 'C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1'
     tic = time.time()
     pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
-    pat_path = sys.argv[1]
+    # pat_path = sys.argv[1]
     # nodes = Cluster(pat_path).nodes
     # attrib = 'cpu'
     start = [0, 1505148392, 1505148392, 1505148392]
     end = [0, 1505272675, 1505272675, 1505272675]
     # get_cluster_attrib_data(nodes, attrib, start, end)
-    cluster = Cluster(pat_path)
-    attrib = cluster.attrib
-    nodes = cluster.nodes
-    get_cluster_data_by_time(nodes, attrib, start, end, False)
+
+    get_cluster_data_by_time(pat_path, start, end, False)
     toc = time.time()
     print 'Processing elapsed time: {0}'.format(toc - tic)
