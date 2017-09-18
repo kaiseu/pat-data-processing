@@ -80,19 +80,22 @@ def get_cluster_data_by_time(pat_path, start, end, save_raw):
 
     for attr in attrib:
         cluster_avg[attr] = get_cluster_attrib_data(pat_path, start, end, save_raw, attr)
-    # print cluster_avg
+    if 'cpu' in cluster_avg.keys():
+        cluster_avg['cpu'].insert(0, '1-%idle', 100-cluster_avg['cpu']['%idle'])  # add column '1-%idle' to the result
     return cluster_avg
 
 
 if __name__ == '__main__':
-    # pat_path = 'C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1'
+    pat_path = 'C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1'
     tic = time.time()
-    pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
+    # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
     # pat_path = sys.argv[1]
     # nodes = Cluster(pat_path).nodes
     # attrib = 'cpu'
-    start = [0, 1505148392, 1505148392, 1505148392]
-    end = [0, 1505272675, 1505272675, 1505272675]
+    # start = [0, 1505148392, 1505148392, 1505148392]
+    # end = [0, 1505272675, 1505272675, 1505272675]
+    start = [0, 1487687161, 1487687176]
+    end = [0, 1487687170, 1487687185]
     # get_cluster_attrib_data(nodes, attrib, start, end)
 
     get_cluster_data_by_time(pat_path, start, end, False)
