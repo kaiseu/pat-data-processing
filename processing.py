@@ -191,7 +191,8 @@ def run():
                     start_stamps.append(int(phase_ts[ph].iloc[0, 3] / 1000))
                     end_stamps.append(int(phase_ts[ph].iloc[0, 4] / 1000))
                 assert len(start_stamps) == len(end_stamps)
-                cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+                # cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+                cluster_avg = get_cluster_data_by_time(pat_path, start_stamps, end_stamps, save_raw)
                 print_result(cluster_avg, phase)
                 result_path = pat_path + os.sep + 'pat_avg.txt'
                 save_result(cluster_avg, phase, result_path)
@@ -205,7 +206,8 @@ def run():
                 start_stamps = map(int, (phase_ts['THROUGHPUT_TEST_1'].iloc[stream, 3] / 1000).tolist())
                 end_stamps = map(int, (phase_ts['THROUGHPUT_TEST_1'].iloc[stream, 4] / 1000).tolist())
                 assert len(start_stamps) == len(end_stamps)
-                cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+                # cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+                cluster_avg = get_cluster_data_by_time(pat_path, start_stamps, end_stamps, save_raw)
                 tag = ['stream' + str(s - 1) for s in stream]  # stream begin from 0
                 print_result(cluster_avg, tag)
                 result_path = pat_path + os.sep + 'pat_avg.txt'
@@ -219,7 +221,8 @@ def run():
                 start_stamps = map(int, (phase_ts['POWER_TEST'].iloc[query, 3] / 1000).tolist())
                 end_stamps = map(int, (phase_ts['POWER_TEST'].iloc[query, 4] / 1000).tolist())
                 assert len(start_stamps) == len(end_stamps)
-                cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+                # cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
+                cluster_avg = get_cluster_data_by_time(pat_path, start_stamps, end_stamps, save_raw)
                 tag = ['q' + str(q) for q in query]
                 print_result(cluster_avg, tag)
                 result_path = pat_path + os.sep + 'pat_avg.txt'
