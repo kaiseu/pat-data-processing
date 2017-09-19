@@ -10,15 +10,16 @@
 @desc: 
 
 """
-from multiprocessing import Pool
-from functools import partial
-from component.factory import AttribFactory
 import os
-from cluster import Cluster
-import pandas as pd
-from utils.commonOps import get_paths
 import time
-import sys
+from functools import partial
+from multiprocessing import Pool
+
+import pandas as pd
+
+from cluster import Cluster
+from component.factory import AttribFactory
+from utils.commonOps import get_paths
 
 
 def get_node_attrib_data_by_time(attrib, start, end, file_path):
@@ -43,6 +44,15 @@ def get_node_attrib_data_by_time(attrib, start, end, file_path):
 
 
 def get_cluster_attrib_data(pat_path, start, end, save_raw, attrib):
+    """
+    Get the avg data of a given attrib of the cluster.
+    :param pat_path: pat path of raw data
+    :param start: list of start timestamp
+    :param end: list of end timestamp
+    :param save_raw: whether to save the raw avg data
+    :param attrib: attrib intended to calc, which could be cpu, disk, network, mem
+    :return: data frame that contains the avg attrib data of the cluster
+    """
     pat_path = pat_path + os.sep + 'instruments'
     if os.path.exists(pat_path):
         nodes = get_paths(pat_path)
@@ -50,7 +60,7 @@ def get_cluster_attrib_data(pat_path, start, end, save_raw, attrib):
         print 'Path: {0} does not exist, will exit...'.format(pat_path)
         exit(-1)
 
-    pool = Pool(4)
+    pool = Pool(processes=None)
     func = partial(get_node_attrib_data_by_time, attrib, start, end)
     p = pool.map(func, nodes)
 
@@ -58,9 +68,9 @@ def get_cluster_attrib_data(pat_path, start, end, save_raw, attrib):
     tmp_all = pd.DataFrame()
 
     for i in range(len(p)):
-        tmp_avg = tmp_avg.append(p[i][0])
+        tmp_avg = tmp_avg.append(p[i][0])  # avg data
         if save_raw:
-            tmp_all = tmp_all.append(p[i][1])
+            tmp_all = tmp_all.append(p[i][1])  # all raw data
     if save_raw:
         raw_path = pat_path + os.sep + attrib + '.csv'
         tmp_all.index = pd.to_datetime(tmp_all.index, unit='s')
@@ -73,15 +83,21 @@ def get_cluster_attrib_data(pat_path, start, end, save_raw, attrib):
 
 
 def get_cluster_data_by_time(pat_path, start, end, save_raw):
+    """
+    Get the avg data of all the attrib of the cluster.
+    :param pat_path: pat path of raw data
+    :param start: list of start timestamp
+    :param end: list of end timestamp
+    :param save_raw: whether to save the raw avg data
+    :return: dict that contains all the avg attrib data of the cluster
+    """
     cluster = Cluster(pat_path)
-    attrib = cluster.attrib
-    nodes = cluster.nodes
     cluster_avg = {}
 
-    for attr in attrib:
+    for attr in cluster.attrib:
         cluster_avg[attr] = get_cluster_attrib_data(pat_path, start, end, save_raw, attr)
     if 'cpu' in cluster_avg.keys():
-        cluster_avg['cpu'].insert(0, '1-%idle', 100-cluster_avg['cpu']['%idle'])  # add column '1-%idle' to the result
+        cluster_avg['cpu'].insert(0, '1-%idle', 100 - cluster_avg['cpu']['%idle'])  # add column '1-%idle' to the result
     return cluster_avg
 
 
