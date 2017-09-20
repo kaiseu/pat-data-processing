@@ -59,10 +59,3 @@ class Node:
                 .format(attrib, AttribFactory.node_attrib.keys())
             exit(-1)
 
-
-
-if __name__ == '__main__':
-    node = Node('C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1\\instruments\\hsx-node1\\')
-    avg, all_raw = node.get_attrib_data_by_time()
-    print avg
-    print all_raw
