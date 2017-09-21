@@ -262,7 +262,7 @@ def print_result(cluster_avg, tag):
     for key, value in cluster_avg.items():
         value = value.set_index([tag])
         print '*' * 70
-        print 'Average {0} utilization: \n {1} \n'.format(key, value),
+        print 'Average {0} utilization: \n {1} \n'.format(key, value.to_string()),
     print '*' * 70 + '\n'
 
 
