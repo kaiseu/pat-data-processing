@@ -52,9 +52,9 @@ class Network(CommonBase):
             nic_avg = pd.DataFrame()
             for num in range(num_nics):  # processing each nic
                 nic_data = df.iloc[num:len(all_row):num_nics]
-                tmp = nic_data.iloc[:, 2:].mean(axis=0)  # average of each nics
+                tmp = nic_data.iloc[:, 2:].mean(axis=0)  # average of each NICs
                 nic_avg = nic_avg.append(tmp, ignore_index=True)
-            avg.append(nic_avg.mean(axis=0))  # average value
+            avg.append(nic_avg.sum(axis=0))  # sum of all the averaged NICs
             if len(start) == 1:
                 return avg, df
             else:
@@ -63,9 +63,9 @@ class Network(CommonBase):
                     nic_avg = pd.DataFrame()
                     for num in range(num_nics):  # processing each nic
                         nic_data = df.loc[str(start[i]): str(end[i])].iloc[num:len(all_row):num_nics]
-                        tmp = nic_data.iloc[:, 2:].mean(axis=0)  # average of each nics
+                        tmp = nic_data.iloc[:, 2:].mean(axis=0)  # average of each NICs
                         nic_avg = nic_avg.append(tmp, ignore_index=True)
-                    avg.append(nic_avg.mean(axis=0))  # average value
+                    avg.append(nic_avg.sum(axis=0))  # sum of all the averaged NICs
                 return avg, df
 
         for i in range(len(start)):  # calc the data within the pair of time period
@@ -75,7 +75,7 @@ class Network(CommonBase):
                 nic_data = df.loc[str(start[i]): str(end[i])].iloc[num:len(all_row):num_nics]
                 tmp = nic_data.iloc[:, 2:].mean(axis=0)  # average of each nics
                 nic_avg = nic_avg.append(tmp, ignore_index=True)
-            avg.append(nic_avg.mean(axis=0))  # average value
+            avg.append(nic_avg.sum(axis=0))  # sum of all the averaged NICs
         return avg, df
 
 

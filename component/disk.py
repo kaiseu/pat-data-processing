@@ -51,7 +51,7 @@ class Disk(CommonBase):
                     drop=True)  # every $num_disks is for the same disk
                 tmp = disk_data.iloc[:, 2:].mean(axis=0)  # average of each disks
                 disk_avg = disk_avg.append(tmp, ignore_index=True)
-            avg.append(disk_avg.mean(axis=0))  # average value
+            avg.append(disk_avg.sum(axis=0))  # sum of all the averaged disks
             if len(start) == 1:  # input args: [0], [0]
                 return avg, df
             else:  # input args: [0, 1487687161, 1487687176], [0, 1487687170, 1487687185]
@@ -63,7 +63,7 @@ class Disk(CommonBase):
                             drop=True)  # every $num_disks is for the same disk
                         tmp = disk_data.iloc[:, 2:].astype('float32').mean(axis=0)  # average of each disks
                         disk_avg = disk_avg.append(tmp, ignore_index=True)
-                    avg.append(disk_avg.mean(axis=0))  # average value
+                    avg.append(disk_avg.sum(axis=0))  # sum of all the averaged disks
                 return avg, df
         # input args: [1487687161, 1487687176], [1487687170, 1487687185]
         for i in range(len(start)):  # calc the data within the pair of time period
@@ -74,7 +74,7 @@ class Disk(CommonBase):
                     drop=True)  # every $num_disks is for the same disk
                 tmp = disk_data.iloc[:, 2:].astype('float32').mean(axis=0)  # average of each disks
                 disk_avg = disk_avg.append(tmp, ignore_index=True)
-            avg.append(disk_avg.mean(axis=0))  # average value
+            avg.append(disk_avg.sum(axis=0))  # sum of all the averaged disks
         return avg, df
 
 
