@@ -247,7 +247,7 @@ def save_result(cluster_avg, tag, result_path):
         for key, value in cluster_avg.items():
             value = value.set_index([tag])
             f.write('*' * 70 + '\n')
-            f.write('Average {0} utilization: \n {1} \n'.format(key, value))
+            f.write('Average {0} utilization: \n {1} \n'.format(key, value.to_string()))
         f.write('*' * 70 + '\n')
     print 'Results have been saved to {0}'.format(result_path)
 
