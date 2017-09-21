@@ -41,6 +41,8 @@ Python 2.7+
 Numpy
 tables 3.3.0
 
+when collecting data using PAT(Performacne Anaiysis Tool), the worker nodes should be synced with NTP services.
+
 
 Known Issue:
 
