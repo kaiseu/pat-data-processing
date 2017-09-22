@@ -153,8 +153,11 @@ def run():
     if os.path.exists(pat_path):
         if not log_path:  # only pat_path is assigned
             print 'only pat_path is assigned, calculating BENCHMARK average utilization...\n'
-            cluster_avg = Cluster(pat_path).get_cluster_data_by_time([0], [0], save_raw)
-            print cluster_avg
+            cluster_avg = get_cluster_data_by_time(pat_path, [0], [0], save_raw)
+            tag = [0]
+            print_result(cluster_avg, tag)
+            result_path = pat_path + os.sep + 'pat_avg.txt'
+            save_result(cluster_avg, tag, result_path)
         else:  # pat_path and log_path are assigned
             if os.path.exists(log_path):
                 phase_ts = BBParse(log_path).get_exist_phase_timestamp()
