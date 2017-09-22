@@ -24,8 +24,9 @@ class AttribFactory:
     """
     Factory class for each attribute
     """
-    node_attrib = {'cpu': 'cpustat', 'mem': 'memstat', 'disk': 'iostat', 'network': 'netstat', 'perf': 'perfout',
-                   'vmstat': 'vmstat', 'jvms': 'jvms'}
+    # node_attrib = {'cpu': 'cpustat', 'mem': 'memstat', 'disk': 'iostat', 'network': 'netstat', 'perf': 'perfout',
+    #                'vmstat': 'vmstat', 'jvms': 'jvms'}
+    node_attrib = {'cpu': 'cpustat', 'mem': 'memstat', 'disk': 'iostat', 'network': 'netstat'}
 
     def __init__(self):
         pass

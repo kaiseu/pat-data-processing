@@ -36,7 +36,8 @@ class Node:
         file_names = get_file_names(self.file_path)
         exist_attrib = []
         for names in file_names:
-            exist_attrib.append(AttribFactory().get_attrib(names))
+            if names in AttribFactory().node_attrib.values():
+                exist_attrib.append(AttribFactory().get_attrib(names))
         return sorted(exist_attrib)
 
     def get_attrib_data_by_time(self, attrib, start, end):
