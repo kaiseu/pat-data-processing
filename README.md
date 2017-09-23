@@ -19,7 +19,7 @@ python processing.py -p $pat_path -l $bb_log_path -q $query
 - $streamNumber: optinal, TPCx-BB throughput stream number, if only wants to calculate certain streams. Can input multi values seperated by space.
 - $query: optinal, TPCx-BB query number, if only wants to calculate certain queries. Can input multi values seperated by space.
 
->The result which contains the average System resource utilization(CPU, Memory, Disk I/O, Network I/O...) of a cluster will be saved in $pat_path/instruments/results.txt
+>The result which contains the average System resource utilization(CPU, Memory, Disk I/O, Network I/O...) of a cluster will be saved in $pat_path/pat_avg_all.txt
 
 
 ## Depedencies: 
