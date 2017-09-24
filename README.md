@@ -8,6 +8,7 @@ python processing.py -p $pat_path -l $bb_log_path
 python processing.py -p $pat_path -l $bb_log_path -ph $BB_Phase
 python processing.py -p $pat_path -l $bb_log_path -n $streamNumber  
 python processing.py -p $pat_path -l $bb_log_path -q $query
+python processing.py -p $pat_path -l $bb_log_path -s true
 ```
 
 
@@ -18,6 +19,7 @@ python processing.py -p $pat_path -l $bb_log_path -q $query
 - which includes:'BENCHMARK', 'LOAD_TEST', 'POWER_TEST', 'THROUGHPUT_TEST_1', 'VALIDATE_POWER_TEST', 'VALIDATE_THROUGHPUT_TEST_1'
 - $streamNumber: optinal, TPCx-BB throughput stream number, if only wants to calculate certain streams. Can input multi values seperated by space.
 - $query: optinal, TPCx-BB query number, if only wants to calculate certain queries. Can input multi values seperated by space.
+- -s, whether to save raw result data, default is false.
 
 >The result which contains the average System resource utilization(CPU, Memory, Disk I/O, Network I/O...) of a cluster will be saved in $pat_path/pat_avg_all.txt
 
