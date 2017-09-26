@@ -103,6 +103,11 @@ def get_cluster_data_by_time(pat_path, start, end, save_raw):
         cluster_avg[attr] = get_cluster_attrib_data(pat_path, start, end, save_raw, attr)
     if 'cpu' in cluster_avg.keys():
         cluster_avg['cpu'].insert(0, '1-%idle', 100 - cluster_avg['cpu']['%idle'])  # add column '1-%idle' to the result
+    if 'mem' in cluster_avg.keys():
+        usr_used = cluster_avg['mem']['kbmemused'] - cluster_avg['mem']['kbbuffers'] - cluster_avg['mem']['kbcached']
+        mem_total = cluster_avg['mem']['kbmemused'] + cluster_avg['mem']['kbmemfree']
+        cluster_avg['mem'].insert(0, '%usr_used', usr_used/mem_total * 100)
+        cluster_avg['mem'].insert(1, 'usr_used', usr_used)
     return cluster_avg
 
 
