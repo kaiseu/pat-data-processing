@@ -14,12 +14,14 @@ import os
 import time
 from functools import partial
 from multiprocessing import Pool
+from collections import OrderedDict
 
 import pandas as pd
 
 from cluster import Cluster
 from component.factory import AttribFactory
 from utils.commonOps import get_paths
+# from db.write_db import write_df
 
 
 def get_node_attrib_data_by_time(attrib, start, end, file_path):
@@ -73,8 +75,11 @@ def get_cluster_attrib_data(pat_path, start, end, save_raw, attrib):
             tmp_all = tmp_all.append(p[i][1])  # all raw data
     if save_raw:
         raw_path = pat_path + os.sep + attrib + '.csv'
-        tmp_all.index = pd.to_datetime(tmp_all.index, unit='s')
+        # tmp_all.index = pd.to_datetime(tmp_all.index, unit='s')
         tmp_all.to_csv(raw_path, sep=',')
+    # if save_raw:
+    #     tmp_all.index = pd.to_datetime(tmp_all.index, unit='s')
+    #     write_df(tmp_all, 'pat_avg_large', attrib)
 
     avg = pd.DataFrame()
     for i in range(len(start)):
@@ -92,7 +97,7 @@ def get_cluster_data_by_time(pat_path, start, end, save_raw):
     :return: dict that contains all the avg attrib data of the cluster
     """
     cluster = Cluster(pat_path)
-    cluster_avg = {}
+    cluster_avg = OrderedDict()
 
     for attr in cluster.attrib:
         cluster_avg[attr] = get_cluster_attrib_data(pat_path, start, end, save_raw, attr)
@@ -114,6 +119,6 @@ if __name__ == '__main__':
     end = [0, 1487687170, 1487687185]
     # get_cluster_attrib_data(nodes, attrib, start, end)
 
-    get_cluster_data_by_time(pat_path, start, end, False)
+    get_cluster_data_by_time(pat_path, start, end, True)
     toc = time.time()
     print 'Processing elapsed time: {0}'.format(toc - tic)
