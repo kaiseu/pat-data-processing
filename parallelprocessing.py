@@ -107,7 +107,7 @@ def get_cluster_data_by_time(pat_path, start, end, save_raw):
         usr_used = cluster_avg['mem']['kbmemused'] - cluster_avg['mem']['kbbuffers'] - cluster_avg['mem']['kbcached']
         mem_total = cluster_avg['mem']['kbmemused'] + cluster_avg['mem']['kbmemfree']
         cluster_avg['mem'].insert(0, '%usr_used', usr_used/mem_total * 100)
-        cluster_avg['mem'].insert(1, 'usr_used', usr_used)
+        cluster_avg['mem'].insert(1, 'usr_used_gb', usr_used / 1024 / 1024)  # usr application used memory, saved as GB
     return cluster_avg
 
 
