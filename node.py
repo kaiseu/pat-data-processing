@@ -39,7 +39,7 @@ class Node:
             if names in AttribFactory().node_attrib.values():
                 exist_attrib.append(AttribFactory().get_attrib(names))
             else:
-                print '{0} module not implemented yet, will ignore it...'.format(names)
+                print '{0} module not implemented yet, will ignore it...\n'.format(names)
         return sorted(exist_attrib)
 
     def get_attrib_data_by_time(self, attrib, start, end):

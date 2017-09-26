@@ -18,6 +18,7 @@ import time
 from datetime import datetime
 
 import pandas as pd
+import datetime
 
 from bb_parse import BBParse
 from cluster import Cluster
@@ -155,9 +156,9 @@ def run():
             print 'only pat_path is assigned, calculating BENCHMARK average utilization...\n'
             cluster_avg = get_cluster_data_by_time(pat_path, [0], [0], save_raw)
             tag = [0]
-            print_result(cluster_avg, tag)
+            print_pat_result(cluster_avg, tag)
             result_path = pat_path + os.sep + 'pat_avg.txt'
-            save_result(cluster_avg, tag, result_path)
+            save_pat_result(cluster_avg, tag, result_path)
         else:  # pat_path and log_path are assigned
             if os.path.exists(log_path):
                 phase_ts = BBParse(log_path).get_exist_phase_timestamp()
@@ -186,9 +187,11 @@ def run():
                         tag.extend(['q' + str(i) for i in phase_ts[key].iloc[1:, 2]])
                     elif key == 'THROUGHPUT_TEST_1':
                         tag.extend(['stream' + str(i) for i in phase_ts[key].iloc[1:, 1]])
-                print_result(cluster_avg, tag)
+                print_pat_result(cluster_avg, tag)
                 result_path = pat_path + os.sep + 'pat_avg_all.txt'
-                save_result(cluster_avg, tag, result_path)
+                save_pat_result(cluster_avg, tag, result_path)
+                print_bb_result(phase_ts)
+                save_bb_result(phase_ts, result_path)
             elif (not query) & (not stream) & (set(phase).issubset(phase_ts.keys())):  # for BB phase
                 for ph in phase:
                     start_stamps.append(int(phase_ts[ph].iloc[0, 3] / 1000))
@@ -196,9 +199,9 @@ def run():
                 assert len(start_stamps) == len(end_stamps)
                 # cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
                 cluster_avg = get_cluster_data_by_time(pat_path, start_stamps, end_stamps, save_raw)
-                print_result(cluster_avg, phase)
+                print_pat_result(cluster_avg, phase)
                 result_path = pat_path + os.sep + 'pat_avg.txt'
-                save_result(cluster_avg, phase, result_path)
+                save_pat_result(cluster_avg, phase, result_path)
             elif not query:  # for throughput streams
                 num_streams = phase_ts['THROUGHPUT_TEST_1'].shape[0] - 1  # num of throughput steams from the log
                 if any(s >= num_streams for s in stream):  # check if input streamNumber is right
@@ -212,9 +215,9 @@ def run():
                 # cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
                 cluster_avg = get_cluster_data_by_time(pat_path, start_stamps, end_stamps, save_raw)
                 tag = ['stream' + str(s - 1) for s in stream]  # stream begin from 0
-                print_result(cluster_avg, tag)
+                print_pat_result(cluster_avg, tag)
                 result_path = pat_path + os.sep + 'pat_avg.txt'
-                save_result(cluster_avg, tag, result_path)
+                save_pat_result(cluster_avg, tag, result_path)
             elif not stream:  # for query
                 exist_queries = phase_ts['POWER_TEST'].iloc[:, 2].tolist()
                 if not set(query).issubset(set(exist_queries)):  # check if input queries existing in the log
@@ -227,9 +230,9 @@ def run():
                 # cluster_avg = Cluster(pat_path).get_cluster_data_by_time(start_stamps, end_stamps, save_raw)
                 cluster_avg = get_cluster_data_by_time(pat_path, start_stamps, end_stamps, save_raw)
                 tag = ['q' + str(q) for q in query]
-                print_result(cluster_avg, tag)
+                print_pat_result(cluster_avg, tag)
                 result_path = pat_path + os.sep + 'pat_avg.txt'
-                save_result(cluster_avg, tag, result_path)
+                save_pat_result(cluster_avg, tag, result_path)
             else:
                 print 'The input arguments is not supported, exiting...'
                 exit(-1)
@@ -238,7 +241,7 @@ def run():
         exit(-1)
 
 
-def save_result(cluster_avg, tag, result_path):
+def save_pat_result(cluster_avg, tag, result_path):
     """
     Save result to file
     :param cluster_avg: cluster_avg: dict that contains node avg attribute, e.g. CPU, Disk, Mem, Network
@@ -249,13 +252,13 @@ def save_result(cluster_avg, tag, result_path):
     with open(result_path, 'w') as f:
         for key, value in cluster_avg.items():
             value = value.set_index([tag])
-            f.write('*' * 70 + '\n')
+            f.write('*' * 100 + '\n')
             f.write('Average {0} utilization: \n {1} \n'.format(key, value.to_string()))
-        f.write('*' * 70 + '\n')
-    print 'Results have been saved to {0}'.format(result_path)
+        f.write('*' * 100 + '\n')
+    print 'Results have been saved to {0} \n'.format(result_path)
 
 
-def print_result(cluster_avg, tag):
+def print_pat_result(cluster_avg, tag):
     """
     print avg result
     :param cluster_avg: dict that contains node avg attribute, e.g. CPU, Disk, Mem, Network
@@ -264,10 +267,40 @@ def print_result(cluster_avg, tag):
     """
     for key, value in cluster_avg.items():
         value = value.set_index([tag])
-        print '*' * 70
+        print '*' * 100
         print 'Average {0} utilization: \n {1} \n'.format(key, value.to_string()),
-    print '*' * 70 + '\n'
+    print '*' * 100 + '\n'
 
+
+def print_bb_result(phase_ts):
+    df = pd.DataFrame(index=phase_ts.keys(), columns=('EpochStartTime', 'EpochEndTime', 'ElapsedTime'))
+    for key, value in phase_ts.items():
+        start = (value['epochStartTimestamp'][0]) / 1000
+        end = (value['epochEndTimestamp'][0]) / 1000
+        during = datetime.timedelta(seconds=int(end - start))
+        start = pd.to_datetime(start, unit='s')
+        end = pd.to_datetime(end, unit='s')
+
+        df.loc[key] = [start, end, during]
+    print '*' * 100
+    print 'Elapsed Time for each Phase: \n'
+    print df.to_string()
+
+
+def save_bb_result(phase_ts, result_path):
+    df = pd.DataFrame(index=phase_ts.keys(), columns=('EpochStartTime', 'EpochEndTime', 'ElapsedTime'))
+    for key, value in phase_ts.items():
+        start = (value['epochStartTimestamp'][0]) / 1000
+        end = (value['epochEndTimestamp'][0]) / 1000
+        during = datetime.timedelta(seconds=int(end - start))
+        start = pd.to_datetime(start, unit='s')
+        end = pd.to_datetime(end, unit='s')
+
+        df.loc[key] = [start, end, during]
+    print df.to_string()
+    with open(result_path, 'a') as f:
+        f.write('\n' + '*' * 100 + '\n')
+        f.write('Elapsed Time for each Phase: \n {0} \n'.format(df.to_string()))
 
 if __name__ == '__main__':
     start = time.time()
