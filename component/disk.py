@@ -76,10 +76,3 @@ class Disk(CommonBase):
                 disk_avg = disk_avg.append(tmp, ignore_index=True)
             avg.append(disk_avg.sum(axis=0))  # sum of all the averaged disks
         return avg, df
-
-
-if __name__ == '__main__':
-    disk = Disk('C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1\\instruments\\hsx-node1\\iostat')
-    avg, all_raw = disk.get_data_by_time([0, 1487687161, 1487687176], [0, 1487687170, 1487687185])
-    print avg
-    print all_raw

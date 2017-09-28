@@ -15,7 +15,6 @@ import os
 from collections import OrderedDict
 
 import pandas as pd
-import datetime
 
 
 class BBParse:
@@ -139,20 +138,3 @@ class BBParse:
             print 'It seems BigBenchTimes.csv in {0} does not include any TPCx-BB phases, ' \
                   'existing...'.format(self.bb_log_path)
             exit(-1)
-
-
-if __name__ == '__main__':
-    bb_parse = BBParse(
-        'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_spark163_1TB_r1')
-    phase_ts = bb_parse.get_exist_phase_timestamp()
-
-    df = pd.DataFrame(index=phase_ts.keys(), columns=('EpochStartTime', 'EpochEndTime', 'ElapsedTime'))
-    for key, value in phase_ts.items():
-        start = (value['epochStartTimestamp'][0]) / 1000
-        end = (value['epochEndTimestamp'][0]) / 1000
-        during = datetime.timedelta(seconds=int(end - start))
-        start = pd.to_datetime(start, unit='s')
-        end = pd.to_datetime(end, unit='s')
-
-        df.loc[key] = [start, end, during]
-    print df.to_string()

@@ -77,10 +77,3 @@ class Network(CommonBase):
                 nic_avg = nic_avg.append(tmp, ignore_index=True)
             avg.append(nic_avg.sum(axis=0))  # sum of all the averaged NICs
         return avg, df
-
-
-if __name__ == '__main__':
-    network = Network('C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1\\instruments\\hsx-node1\\netstat')
-    avg, all_raw = network.get_data_by_time([0, 1487687161, 1487687176], [0, 1487687170, 1487687185])
-    print avg
-    print all_raw

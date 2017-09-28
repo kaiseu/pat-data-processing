@@ -57,10 +57,3 @@ class Mem(CommonBase):
 
     def used_col_num(self):
         return len(self.__used_col)
-
-
-if __name__ == '__main__':
-    mem = Mem('C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1\\instruments\\hsx-node1\\memstat')
-    avg, all_raw = mem.get_data_by_time([1487687161, 1487687176], [1487687170, 1487687185])
-    print avg
-    print all_raw

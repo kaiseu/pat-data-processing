@@ -12,16 +12,14 @@
 """
 
 import os
-import time
 from datetime import datetime
 from multiprocessing import Pool, Process
 
 import pandas as pd
 
-from  component.factory import AttribFactory
+from component.factory import AttribFactory
 from node import Node
 from utils.commonOps import get_paths
-import sys
 
 
 class Cluster(Node):
@@ -70,17 +68,10 @@ class Cluster(Node):
             if save_raw:
                 tmp_all.index = pd.to_datetime(tmp_all.index, unit='s')
                 tmp_all.to_csv(raw_path, sep=',')
-
-            # if save_raw:
-            #     tmp_all.index = pd.to_datetime(tmp_all.index, unit='s')
-            #     write_db.write_df(tmp_all, 'pat_avg_large', attrib)
             avg = pd.DataFrame()
             for i in range(len(start)):
                 avg = avg.append(tmp_avg.loc[i].mean(axis=0), ignore_index=True)
             cluster_avg[attrib] = avg
-        # result_path = self.pat_path + os.sep + 'results.txt'
-        # print cluster_avg
-        # self.save_result(cluster_avg, result_path)
         return cluster_avg
 
     def get_node_attrib_data_by_time(self, file_path, attrib, start, end):
@@ -109,8 +100,6 @@ class Cluster(Node):
         tmp_avg = pd.DataFrame()
         for node in self.nodes:
             p = Process(target=self.get_node_attrib_data_by_time(), args=(node, attrib, start, end))
-            print p
-            # tmp_avg.append(p)
             p.start()
         print tmp_avg
 
@@ -192,21 +181,3 @@ class Cluster(Node):
             for key in attrib_avg.keys():
                 f.write('\nAverage {0} utilization: \n {1} \n'.format(key, attrib_avg.get(key).to_string(index=False)))
             print 'Results have been saved to: {0}'.format(result_file)
-
-
-if __name__ == '__main__':
-    """
-    test only
-    """
-    # pat_path = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1'
-    # pat_path = 'C:\\Users\\xuk1\PycharmProjects\\tmp_data\pat_spark163_1TB_r1'
-    pat_path = sys.argv[1]
-    cluster = Cluster(pat_path)
-    start = time.time()
-    print cluster.get_cluster_data_by_time([0, 1505148392, 1505148392, 1505148392], [0, 1505272675, 1505272675, 1505272675], False)
-    # cluster.get_cluster_attrib_data('cpu', [0, 1487687161, 1487687176], [0, 1487687170, 1487687185])
-    end = time.time()
-    print 'Processing elapsed time: {0}'.format(end - start)
-
-    # df = pd.read_hdf('C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\pat_cdh511_HoS_27workers_2699v4_72vcores_PCIe_30T_4S_r1\\instruments\\cpu.h5', 'cpu')
-    # print df
