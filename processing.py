@@ -243,7 +243,7 @@ def run():
 
 def save_pat_result(cluster_avg, tag, result_path):
     """
-    Save result to file
+    Save PAT result to file
     :param cluster_avg: cluster_avg: dict that contains node avg attribute, e.g. CPU, Disk, Mem, Network
     :param tag: tags for the output index, can be stream number: stream# or query number: q#
     :param result_path: result save path
@@ -260,7 +260,7 @@ def save_pat_result(cluster_avg, tag, result_path):
 
 def print_pat_result(cluster_avg, tag):
     """
-    print avg result
+    print avg PAT result
     :param cluster_avg: dict that contains node avg attribute, e.g. CPU, Disk, Mem, Network
     :param tag: tags for the output index, can be stream number: stream# or query number: q#
     :return: None
@@ -273,6 +273,11 @@ def print_pat_result(cluster_avg, tag):
 
 
 def print_bb_result(phase_ts):
+    """
+    Print BigBench result
+    :param phase_ts: dict that keys are BigBench phase and values are elapsed time
+    :return: None
+    """
     df = pd.DataFrame(index=phase_ts.keys(), columns=('EpochStartTime', 'EpochEndTime', 'ElapsedTime'))
     for key, value in phase_ts.items():
         start = (value['epochStartTimestamp'][0]) / 1000
@@ -288,6 +293,12 @@ def print_bb_result(phase_ts):
 
 
 def save_bb_result(phase_ts, result_path):
+    """
+    Save BigBench elapsed time result
+    :param phase_ts: dict that keys are BigBench phase and values are elapsed time
+    :param result_path: result save path, will append to PAT result file 
+    :return: None
+    """
     df = pd.DataFrame(index=phase_ts.keys(), columns=('EpochStartTime', 'EpochEndTime', 'ElapsedTime'))
     for key, value in phase_ts.items():
         start = (value['epochStartTimestamp'][0]) / 1000
