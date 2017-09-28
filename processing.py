@@ -297,7 +297,6 @@ def save_bb_result(phase_ts, result_path):
         end = pd.to_datetime(end, unit='s')
 
         df.loc[key] = [start, end, during]
-    print df.to_string()
     with open(result_path, 'a') as f:
         f.write('\n' + '*' * 100 + '\n')
         f.write('Elapsed Time for each Phase: \n {0} \n'.format(df.to_string()))
