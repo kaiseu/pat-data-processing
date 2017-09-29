@@ -29,7 +29,7 @@ python processing.py -p $pat_path -l $bb_log_path -s true
 - Numpy
 - tables 3.3.0
 
->when collecting data using PAT(Performacne Anaiysis Tool), the worker nodes should be synced with NTP services.
+>when collecting data using [PAT](https://github.com/intel-hadoop/PAT)(Performacne Anaiysis Tool), the worker nodes should be synced with NTP services.
 
 
 ## Known Issue:
