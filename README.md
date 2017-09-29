@@ -25,7 +25,7 @@ python processing.py -p $pat_path -l $bb_log_path -s true
 
 
 ## Depedencies: 
-- Python 2.7+
+- Python 2.7+(on the python2 series), Python 3.x+ is not tested yet
 - Numpy
 - tables 3.3.0
 
