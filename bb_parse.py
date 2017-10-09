@@ -142,6 +142,10 @@ class BBParse:
             exit(-1)
 
     def get_elapsed_time(self):
+        """
+        Get TPCx-BB elapsed time of each query in all the phases from BigBenchTimes.csv file
+        :return: Results will be saved in $bb_log_path/results.txt
+        """
         self.get_bb_result()
         csv_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchTimes.csv'
         if not os.path.isfile(csv_path):
@@ -173,25 +177,24 @@ class BBParse:
                 is_exist = True
         if is_exist:
             print '*' * 100
-            print 'Elapsed time of each phase:'
-            print '*' * 100
-            print elapsed_time.to_string()
-            print '\n'
+            print 'Elapsed time of each phase:\n {0} \n'.format(elapsed_time.to_string())
 
             result_path = self.bb_log_path + os.sep + 'results.txt'
             with open(result_path, 'a') as f:
                 f.write('*' * 100 + '\n')
-                f.write('Elapsed time of each phase:\n')
-                f.write('*' * 100 + '\n')
-                f.write(elapsed_time.to_string())
-                f.write('\n')
-            print 'TPCx-BB elapsed time results have been saved to {0} \n'.format(result_path)
+                f.write('Elapsed time of each phase:\n {0} \n'.format(elapsed_time.to_string()))
+            print 'Log results have been saved to {0} \n'.format(result_path)
+            print '*' * 100
         else:
             print 'It seems BigBenchTimes.csv in {0} does not include TPCx-BB phases:POWER_TEST, THROUGHPUT_TEST_1'\
                   'existing...'.format(self.bb_log_path)
             exit(-1)
 
     def get_bb_result(self):
+        """
+        Parse TPCx-BB score from BigBenchResult.log file
+        :return: Results will be saved in $bb_log_path/results.txt
+        """
         log_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchResult.log'
         if not os.path.isfile(log_path):
             print 'BigBenchResult.log does not exist in {0}, existing...'.format(self.bb_log_path)
@@ -221,19 +224,11 @@ class BBParse:
         result_path = self.bb_log_path + os.sep + 'results.txt'
         print ('*' * 100)
         print ('TPCx-BB results:')
-        print ('*' * 100)
         with open(result_path, 'w') as f:
             f.write('*' * 100 + '\n')
             f.write('TPCx-BB results: \n')
-            f.write('*' * 100 + '\n')
             for key, value in result.items():
                 print '{0}: {1}'.format(key, value)
                 f.write(key + ': ' + str(value) + '\n')
-            print '\n'
             f.write('\n')
 
-if __name__ == '__main__':
-    bb_log = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_spark163_1TB_r1'
-    parse = BBParse(bb_log)
-    parse.get_elapsed_time()
-    # parse.get_bb_result()
