@@ -159,7 +159,11 @@ def run():
             save_pat_result(cluster_avg, tag, result_path)
         else:  # pat_path and log_path are assigned
             if os.path.exists(log_path):
-                phase_ts = BBParse(log_path).get_exist_phase_timestamp()
+                bb_parse = BBParse(log_path)
+                print 'Parsing TPCx-BB log files...\n'
+                bb_parse.get_elapsed_time()
+                print 'Started to process PAT files...\n'
+                phase_ts = bb_parse.get_exist_phase_timestamp()
             else:
                 print 'TPCx-BB log file path: {0} does not exist, exiting...'.format(log_path)
                 exit(-1)
