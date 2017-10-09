@@ -285,10 +285,11 @@ def print_bb_result(phase_ts):
         start = (value['epochStartTimestamp'][0]) / 1000
         end = (value['epochEndTimestamp'][0]) / 1000
         during = datetime.timedelta(seconds=int(end - start))
+
         start = pd.to_datetime(start, unit='s')
         end = pd.to_datetime(end, unit='s')
 
-        df.loc[key] = [start, end, during]
+        df.loc[key] = [start, end, convert_timedelta(during)]
     print '*' * 100
     print 'Elapsed Time for each Phase: \n'
     print df.to_string()
@@ -309,11 +310,23 @@ def save_bb_result(phase_ts, result_path):
         start = pd.to_datetime(start, unit='s')
         end = pd.to_datetime(end, unit='s')
 
-        df.loc[key] = [start, end, during]
+        df.loc[key] = [start, end, convert_timedelta(during)]
     with open(result_path, 'a') as f:
         f.write('\n' + '*' * 100 + '\n')
         f.write('Elapsed Time for each Phase: \n {0} \n'.format(df.to_string()))
 
+
+def convert_timedelta(duration):
+    """
+    Convert timedelta to H:M:S
+    :param duration: datetime.timedelta object
+    :return: string of H:M:S
+    """
+    days, seconds = duration.days, duration.seconds
+    hours = days * 24 + seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = (seconds % 60)
+    return '{0}h:{1}m:{2}s'.format(hours, minutes, seconds)
 
 if __name__ == '__main__':
     start = time.time()
