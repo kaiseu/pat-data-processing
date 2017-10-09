@@ -15,6 +15,8 @@ import os
 from collections import OrderedDict
 
 import pandas as pd
+import numpy as np
+import re
 
 
 class BBParse:
@@ -115,13 +117,13 @@ class BBParse:
                     stream_num = ((df['streamNumber']) == 0)
                     mask = benchmark_phase & stream_num
                     phase_ts[phase] = df[mask].reset_index(drop=True)
-                    phase_ts[phase].iloc[0, 2] = 0  # file 0 to blank value
+                    phase_ts[phase].iloc[0, 2] = 0  # fill 0 to blank value
                 elif phase == 'THROUGHPUT_TEST_1':  # throughput test overall and each stream
                     query_num = (pd.isnull(df['queryNumber']))
                     mask = benchmark_phase & query_num
                     phase_ts[phase] = df[mask].reset_index(drop=True)
                     phase_ts[phase].iloc[0, 1:3] = -1  # file -1 to overall throughput test
-                    phase_ts[phase].iloc[1:, 2] = 0  # file 0 to blank value
+                    phase_ts[phase].iloc[1:, 2] = 0  # fill 0 to blank value
                 else:  # other phases
                     stream_num = (pd.isnull(df['streamNumber']))
                     query_num = (pd.isnull(df['queryNumber']))
@@ -129,7 +131,7 @@ class BBParse:
                     # phase_start = line['epochStartTimestamp'].values / 1000
                     # phase_end = line['epochEndTimestamp'].values / 1000
                     phase_ts[phase] = df[mask].reset_index(drop=True)
-                    phase_ts[phase].iloc[0, 1:3] = 0  # file 0 to blank value
+                    phase_ts[phase].iloc[0, 1:3] = 0  # fill 0 to blank value
                 phase_ts[phase] = phase_ts[phase].astype(converter)
                 is_exist = True
         if is_exist:
@@ -138,3 +140,100 @@ class BBParse:
             print 'It seems BigBenchTimes.csv in {0} does not include any TPCx-BB phases, ' \
                   'existing...'.format(self.bb_log_path)
             exit(-1)
+
+    def get_elapsed_time(self):
+        self.get_bb_result()
+        csv_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchTimes.csv'
+        if not os.path.isfile(csv_path):
+            print 'BigBenchTimes.csv does not exist in {0}, existing...'.format(self.bb_log_path)
+            exit(-1)
+        df = pd.read_csv(csv_path, delimiter=';').loc[:,
+             ['benchmarkPhase', 'streamNumber', 'queryNumber', 'durationInSeconds']]
+        elapsed_time = pd.DataFrame()
+        is_exist = False
+        for phase in ['POWER_TEST', 'THROUGHPUT_TEST_1']:
+            benchmark_phase = (df['benchmarkPhase'] == phase)
+            if any(benchmark_phase):  # whether this phase exist in the BB logs
+                if phase == 'POWER_TEST':  # power test overall and each query
+                    stream_num = ((df['streamNumber']) == 0)
+                    query_num = (pd.notnull(df['queryNumber']))
+                    mask = benchmark_phase & stream_num & query_num
+                    seconds = df[mask]['durationInSeconds'].values
+                    elapsed_time.insert(0, phase, seconds)
+                    elapsed_time.index = df[mask]['queryNumber'].astype('int64')
+                elif phase == 'THROUGHPUT_TEST_1':
+                    streams = int(np.max(df['streamNumber']))
+                    for stream in range(streams + 1):
+                        stream_num = ((df['streamNumber']) == stream)
+                        query_num = (pd.notnull(df['queryNumber']))
+                        mask = benchmark_phase & stream_num & query_num
+                        seconds = df[mask]['durationInSeconds'].values
+                        elapsed_time.insert(stream + 1, 'stream{0}'.format(stream), seconds)
+                        elapsed_time.index = df[mask]['queryNumber'].astype('int64')
+                is_exist = True
+        if is_exist:
+            print '*' * 100
+            print 'Elapsed time of each phase:'
+            print '*' * 100
+            print elapsed_time.to_string()
+            print '\n'
+
+            result_path = self.bb_log_path + os.sep + 'results.txt'
+            with open(result_path, 'a') as f:
+                f.write('*' * 100 + '\n')
+                f.write('Elapsed time of each phase:\n')
+                f.write('*' * 100 + '\n')
+                f.write(elapsed_time.to_string())
+                f.write('\n')
+            print 'TPCx-BB elapsed time results have been saved to {0} \n'.format(result_path)
+        else:
+            print 'It seems BigBenchTimes.csv in {0} does not include TPCx-BB phases:POWER_TEST, THROUGHPUT_TEST_1'\
+                  'existing...'.format(self.bb_log_path)
+            exit(-1)
+
+    def get_bb_result(self):
+        log_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchResult.log'
+        if not os.path.isfile(log_path):
+            print 'BigBenchResult.log does not exist in {0}, existing...'.format(self.bb_log_path)
+            exit(-1)
+        result = OrderedDict()
+        with open(log_path, 'r') as f:
+            for line in f:
+                if re.match('(.*)T_LOAD = (.*)', line):
+                    T_LOAD = line.split('=')[1].strip()
+                    result['T_LOAD'] = float(T_LOAD)
+                if re.match('(.*)T_LD = (.*)', line):
+                    T_LD = line.split(':')[2].strip()
+                    result['T_LD'] = float(T_LD)
+                if re.match('(.*)T_PT = (.*)', line):
+                    T_PT = line.split('=')[1].strip()
+                    result['T_PT'] = float(T_PT)
+                if re.match('(.*)T_T_PUT = (.*)', line):
+                    T_T_PUT = line.split('=')[1].strip()
+                    result['T_T_PUT'] = float(T_T_PUT)
+                if re.match('(.*)T_TT = (.*)', line):
+                    T_TT = line.split('=')[1].strip()
+                    result['T_TT'] = float(T_TT)
+                if re.match('(.*)VALID BBQpm@(.*)', line):
+                    key = line.split('=')[0].split(' ')[2].strip()
+                    value = line.split('=')[1].strip()
+                    result[key] = float(value)
+        result_path = self.bb_log_path + os.sep + 'results.txt'
+        print ('*' * 100)
+        print ('TPCx-BB results:')
+        print ('*' * 100)
+        with open(result_path, 'w') as f:
+            f.write('*' * 100 + '\n')
+            f.write('TPCx-BB results: \n')
+            f.write('*' * 100 + '\n')
+            for key, value in result.items():
+                print '{0}: {1}'.format(key, value)
+                f.write(key + ': ' + str(value) + '\n')
+            print '\n'
+            f.write('\n')
+
+if __name__ == '__main__':
+    bb_log = 'C:\\Users\\xuk1\\PycharmProjects\\tmp_data\\logs_spark163_1TB_r1'
+    parse = BBParse(bb_log)
+    parse.get_elapsed_time()
+    # parse.get_bb_result()
