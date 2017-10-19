@@ -96,7 +96,7 @@ class BBParse:
 
     def get_exist_phase_timestamp(self):
         """
-        Parse TPCx-BB  each phase's timestamps from TPCx-BB log file BigBenchTimes.csv. 
+        Parse TPCx-BB each phase's timestamps from TPCx-BB log file BigBenchTimes.csv. 
         For POWER_TEST each query will included, for THROUGHPUT_TEST_1, each stream will included
         :return: dict that contains start and end timestamps of each phase
         """
@@ -144,7 +144,7 @@ class BBParse:
     def get_elapsed_time(self):
         """
         Get TPCx-BB elapsed time of each query in all the phases from BigBenchTimes.csv file
-        :return: Results will be saved in $bb_log_path/results.txt
+        :return: Results will be saved in $bb_log_path/results.log
         """
         self.get_bb_result()
         csv_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchTimes.csv'
@@ -177,14 +177,12 @@ class BBParse:
                 is_exist = True
         if is_exist:
             print '*' * 100
-            print 'Elapsed time of each phase:\n {0} \n'.format(elapsed_time.to_string())
+            print 'Elapsed time of each query:\n {0} \n'.format(elapsed_time.to_string())
 
-            result_path = self.bb_log_path + os.sep + 'results.txt'
+            result_path = self.bb_log_path + os.sep + 'results.log'
             with open(result_path, 'a') as f:
                 f.write('*' * 100 + '\n')
-                f.write('Elapsed time of each phase:\n {0} \n'.format(elapsed_time.to_string()))
-            print 'Log results have been saved to {0} \n'.format(result_path)
-            print '*' * 100
+                f.write('Elapsed time of each query:\n {0} \n'.format(elapsed_time.to_string()))
         else:
             print 'It seems BigBenchTimes.csv in {0} does not include TPCx-BB phases:POWER_TEST, THROUGHPUT_TEST_1'\
                   'existing...'.format(self.bb_log_path)
@@ -193,7 +191,7 @@ class BBParse:
     def get_bb_result(self):
         """
         Parse TPCx-BB score from BigBenchResult.log file
-        :return: Results will be saved in $bb_log_path/results.txt
+        :return: Results will be saved in $bb_log_path/results.log
         """
         log_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchResult.log'
         if not os.path.isfile(log_path):
@@ -221,7 +219,7 @@ class BBParse:
                     key = line.split('=')[0].split(' ')[2].strip()
                     value = line.split('=')[1].strip()
                     result[key] = float(value)
-        result_path = self.bb_log_path + os.sep + 'results.txt'
+        result_path = self.bb_log_path + os.sep + 'results.log'
         print ('*' * 100)
         print ('TPCx-BB results:')
         with open(result_path, 'w') as f:

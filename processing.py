@@ -57,7 +57,7 @@ def save_avg_result(*option):
     :return: None
     """
     if len(option) == 1:  # only pat_path is assigned
-        result_file = option[0] + os.sep + 'results.txt'
+        result_file = option[0] + os.sep + 'results.log'
         attrib_avg = Cluster(option[0]).get_cluster_data_by_time([0], [0], False)
         with open(result_file, 'w') as f:
             f.write('*' * 110 + '\n')
@@ -70,7 +70,7 @@ def save_avg_result(*option):
         print 'Results have been saved to: {0}'.format(result_file)
         return
     elif len(option) == 2:  # pat_path and bb_log are assigned
-        result_file = option[0] + os.sep + 'results.txt'
+        result_file = option[0] + os.sep + 'results.log'
         phase_name = ('BENCHMARK', 'LOAD_TEST', 'POWER_TEST', 'THROUGHPUT_TEST_1',
                       'VALIDATE_POWER_TEST', 'VALIDATE_THROUGHPUT_TEST_1')
         with open(result_file, 'w') as f:
@@ -90,7 +90,7 @@ def save_avg_result(*option):
         print 'Results have been saved to: {0}'.format(result_file)
         return
     elif len(option) == 3:  # pat_path, bb_log and phase_name are assigned
-        result_file = option[0] + os.sep + 'results.txt'
+        result_file = option[0] + os.sep + 'results.log'
         with open(result_file, 'w') as f:
             start_stamp, end_stamp = BBParse(option[1]).get_stamp_by_phase(option[2])
             start_time = datetime.fromtimestamp(start_stamp).strftime('%Y-%m-%d %H:%M:%S')
@@ -162,8 +162,11 @@ def run():
                 bb_parse = BBParse(log_path)
                 print 'Parsing TPCx-BB log files...\n'
                 bb_parse.get_elapsed_time()
-                print 'Started to process PAT files...\n'
                 phase_ts = bb_parse.get_exist_phase_timestamp()
+                print_bb_result(phase_ts)
+                result_path = log_path + os.sep + 'results.log'
+                save_bb_result(phase_ts, result_path)
+                print 'Started to process PAT files...\n'
             else:
                 print 'TPCx-BB log file path: {0} does not exist, exiting...'.format(log_path)
                 exit(-1)
@@ -180,7 +183,7 @@ def run():
                 bb_result = pd.concat(phase_ts.values(), axis=0).reset_index(drop=True)
                 pat_result = pd.concat(cluster_avg.values(), axis=1)
                 avg_result = pd.concat([bb_result, pat_result], axis=1)
-                result_path = pat_path + os.sep + 'results.txt'
+                result_path = pat_path + os.sep + 'results.log'
                 avg_result.to_csv(result_path, sep=',')
                 tag = []
                 for key in phase_ts.keys():
@@ -190,10 +193,9 @@ def run():
                     elif key == 'THROUGHPUT_TEST_1':
                         tag.extend(['stream' + str(i) for i in phase_ts[key].iloc[1:, 1]])
                 print_pat_result(cluster_avg, tag)
-                result_path = pat_path + os.sep + 'pat_avg_all.txt'
+                result_path = pat_path + os.sep + 'pat_avg_all.log'
                 save_pat_result(cluster_avg, tag, result_path)
-                print_bb_result(phase_ts)
-                save_bb_result(phase_ts, result_path)
+
             elif (not query) & (not stream) & (set(phase).issubset(phase_ts.keys())):  # for BB phase
                 for ph in phase:
                     start_stamps.append(int(phase_ts[ph].iloc[0, 3] / 1000))
@@ -257,8 +259,8 @@ def save_pat_result(cluster_avg, tag, result_path):
             f.write('*' * 100 + '\n')
             f.write('Average {0} utilization: \n {1} \n'.format(key, value.to_string()))
         f.write('*' * 100 + '\n')
-    print 'Results have been saved to {0} \n'.format(result_path)
-
+    print 'PAT results have been saved to {0} \n'.format(result_path)
+    print '*' * 100 + '\n'
 
 def print_pat_result(cluster_avg, tag):
     """
@@ -314,6 +316,9 @@ def save_bb_result(phase_ts, result_path):
     with open(result_path, 'a') as f:
         f.write('\n' + '*' * 100 + '\n')
         f.write('Elapsed Time for each Phase: \n {0} \n'.format(df.to_string()))
+    print '*' * 100 + '\n'
+    print 'Log results have been saved to {0} \n'.format(result_path)
+    print '*' * 100 + '\n'
 
 
 def convert_timedelta(duration):
