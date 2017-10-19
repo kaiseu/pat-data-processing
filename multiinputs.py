@@ -18,6 +18,9 @@ import subprocess
 import sys
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print ('Usage: python multiinputs.py $PATs_PARENT_PATH')
+        exit(-1)
     parent_path = sys.argv[1]
 
     if os.path.exists(parent_path):
@@ -27,8 +30,14 @@ if __name__ == '__main__':
         for dir_name in dirs:
             if dir_name.startswith('pat') or dir_name.startswith('PAT'):
                 pat_dirs.append(dir_name)
+            else:
+                print ('No PAT directory starts with "pat" or "PAT" in {0}, exiting...'.format(parent_path))
+                exit(-1)
             if dir_name.startswith('logs') or dir_name.startswith('LOGS'):
                 log_dirs.append(dir_name)
+            else:
+                print ('No Log directory starts with "logs" or "LOGS" in {0}, exiting...'.format(parent_path))
+                exit(-1)
         assert len(pat_dirs) == len(log_dirs)
         pair = {}
         for pat_dir in pat_dirs:
@@ -49,3 +58,5 @@ if __name__ == '__main__':
             print ('{0} of total {1} pairs finished.'.format(count, len(pair)))
             count += 1
         print ('All file pairs have been finished!')
+    else:
+        print ('Path: {0} does not exist, please check and try later.'.format(parent_path))
