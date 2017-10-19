@@ -13,6 +13,7 @@
 import argparse
 import datetime
 import os
+import subprocess
 import sys
 import time
 
@@ -151,11 +152,12 @@ def run():
     pat_path, log_path, phase, stream, query, save_raw = get_args()
     if os.path.exists(pat_path):
         if not log_path:  # only pat_path is assigned
-            print 'only pat_path is assigned, calculating BENCHMARK average utilization...\n'
+            # print 'only pat_path is assigned, calculating BENCHMARK average utilization...\n'
+            is_log_exist(pat_path)
             cluster_avg = get_cluster_data_by_time(pat_path, [0], [0], save_raw)
             tag = [0]
             print_pat_result(cluster_avg, tag)
-            result_path = pat_path + os.sep + 'pat_avg.txt'
+            result_path = pat_path + os.sep + 'pat_avg.log'
             save_pat_result(cluster_avg, tag, result_path)
         else:  # pat_path and log_path are assigned
             if os.path.exists(log_path):
@@ -164,7 +166,7 @@ def run():
                 bb_parse.get_elapsed_time()
                 phase_ts = bb_parse.get_exist_phase_timestamp()
                 print_bb_result(phase_ts)
-                result_path = log_path + os.sep + 'results.log'
+                result_path = log_path + os.sep + 'bb_results.log'
                 save_bb_result(phase_ts, result_path)
                 print 'Started to process PAT files...\n'
             else:
@@ -183,7 +185,7 @@ def run():
                 bb_result = pd.concat(phase_ts.values(), axis=0).reset_index(drop=True)
                 pat_result = pd.concat(cluster_avg.values(), axis=1)
                 avg_result = pd.concat([bb_result, pat_result], axis=1)
-                result_path = pat_path + os.sep + 'results.log'
+                result_path = pat_path + os.sep + 'bb_results.log'
                 avg_result.to_csv(result_path, sep=',')
                 tag = []
                 for key in phase_ts.keys():
@@ -262,6 +264,7 @@ def save_pat_result(cluster_avg, tag, result_path):
     print 'PAT results have been saved to {0} \n'.format(result_path)
     print '*' * 100 + '\n'
 
+
 def print_pat_result(cluster_avg, tag):
     """
     print avg PAT result
@@ -332,6 +335,36 @@ def convert_timedelta(duration):
     minutes = (seconds % 3600) // 60
     seconds = (seconds % 60)
     return '{0}h:{1}m:{2}s'.format(hours, minutes, seconds)
+
+
+def is_log_exist(pat_path):
+    """
+    Check if $pat_path corresponded TPCx-BB log file exists in the same path of this PAT file, 
+    if exists, will use it to calculate. if the PAT file starts with 'pat' and exists same postfix 
+    log file starts with 'logs', these two files will be regard as a pair. PAT file starts with 'PAT'
+    and log file starts with 'LOGS', will also be regarded as a pair.
+    :param pat_path: input PAT path
+    :return: 
+    """
+    parent_path = os.path.dirname(pat_path)
+    pat_name = os.path.basename(pat_path)
+    logs_name = 'XX'
+    if pat_name.startswith('pat'):
+        logs_name = pat_name.replace('pat', 'logs', 1)
+    if pat_name.startswith('PAT'):
+        logs_name = pat_name.replace('pat', 'LOGS', 1)
+    log_path = parent_path + os.sep + logs_name
+    if os.path.exists(log_path):  # corresponding log file exists
+        print ('Existing corresponding TPCx-BB log file in the parent directory of current PAT path, '
+               'will regard it as corresponding log file...\n')
+        print os.path.abspath(__file__)
+        command = 'python {0} -p {1} -l {2}'.format(os.path.abspath(__file__), pat_path, log_path)
+        subprocess.call(command, shell=True)
+        exit(0)
+    else:
+        print ('Can not find corresponding TPCx-BB log file automatically, '
+               'will calculate only using the assigned PAT file...\n')
+
 
 if __name__ == '__main__':
     start = time.time()

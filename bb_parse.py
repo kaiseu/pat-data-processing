@@ -12,11 +12,11 @@
 """
 
 import os
+import re
 from collections import OrderedDict
 
-import pandas as pd
 import numpy as np
-import re
+import pandas as pd
 
 
 class BBParse:
@@ -184,14 +184,14 @@ class BBParse:
                 f.write('*' * 100 + '\n')
                 f.write('Elapsed time of each query:\n {0} \n'.format(elapsed_time.to_string()))
         else:
-            print 'It seems BigBenchTimes.csv in {0} does not include TPCx-BB phases:POWER_TEST, THROUGHPUT_TEST_1'\
+            print 'It seems BigBenchTimes.csv in {0} does not include TPCx-BB phases:POWER_TEST, THROUGHPUT_TEST_1' \
                   'existing...'.format(self.bb_log_path)
             exit(-1)
 
     def get_bb_result(self):
         """
         Parse TPCx-BB score from BigBenchResult.log file
-        :return: Results will be saved in $bb_log_path/results.log
+        :return: Results will be saved in $bb_log_path/bb_results.log
         """
         log_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchResult.log'
         if not os.path.isfile(log_path):
@@ -219,7 +219,7 @@ class BBParse:
                     key = line.split('=')[0].split(' ')[2].strip()
                     value = line.split('=')[1].strip()
                     result[key] = float(value)
-        result_path = self.bb_log_path + os.sep + 'results.log'
+        result_path = self.bb_log_path + os.sep + 'bb_results.log'
         print ('*' * 100)
         print ('TPCx-BB results:')
         with open(result_path, 'w') as f:
@@ -229,4 +229,3 @@ class BBParse:
                 print '{0}: {1}'.format(key, value)
                 f.write(key + ': ' + str(value) + '\n')
             f.write('\n')
-
