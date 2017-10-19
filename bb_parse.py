@@ -144,7 +144,7 @@ class BBParse:
     def get_elapsed_time(self):
         """
         Get TPCx-BB elapsed time of each query in all the phases from BigBenchTimes.csv file
-        :return: Results will be saved in $bb_log_path/results.log
+        :return: Results will be saved in $bb_log_path/bb_results.log
         """
         self.get_bb_result()
         csv_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchTimes.csv'
@@ -179,7 +179,7 @@ class BBParse:
             print '*' * 100
             print 'Elapsed time of each query:\n {0} \n'.format(elapsed_time.to_string())
 
-            result_path = self.bb_log_path + os.sep + 'results.log'
+            result_path = self.bb_log_path + os.sep + 'bb_results.log'
             with open(result_path, 'a') as f:
                 f.write('*' * 100 + '\n')
                 f.write('Elapsed time of each query:\n {0} \n'.format(elapsed_time.to_string()))

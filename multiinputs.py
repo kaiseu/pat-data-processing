@@ -30,14 +30,13 @@ if __name__ == '__main__':
         for dir_name in dirs:
             if dir_name.startswith('pat') or dir_name.startswith('PAT'):
                 pat_dirs.append(dir_name)
-            else:
-                print ('No PAT directory starts with "pat" or "PAT" in {0}, exiting...'.format(parent_path))
-                exit(-1)
             if dir_name.startswith('logs') or dir_name.startswith('LOGS'):
                 log_dirs.append(dir_name)
-            else:
-                print ('No Log directory starts with "logs" or "LOGS" in {0}, exiting...'.format(parent_path))
-                exit(-1)
+
+        if not (len(pat_dirs) > 0 and len(log_dirs) > 0):
+            print ('No PAT directory starts with "pat" or "PAT", or Log directory starts with "logs" or "LOGS" in {0},'
+                   ' exiting...'.format(parent_path))
+            exit(-1)
         assert len(pat_dirs) == len(log_dirs)
         pair = {}
         for pat_dir in pat_dirs:
