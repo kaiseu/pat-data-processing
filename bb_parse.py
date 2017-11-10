@@ -13,10 +13,13 @@
 
 import os
 import re
+import sys
 from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
+
+import processing
 
 
 class BBParse:
@@ -229,3 +232,23 @@ class BBParse:
                 print '{0}: {1}'.format(key, value)
                 f.write(key + ': ' + str(value) + '\n')
             f.write('\n')
+
+
+if __name__ == '__main__':
+    arg_len = len(sys.argv)
+    if arg_len == 2:
+        log_path = sys.argv[1]
+        if os.path.exists(log_path):
+            bb_parse = BBParse(log_path)
+            print 'Parsing TPCx-BB log files...\n'
+            bb_parse.get_elapsed_time()
+            phase_ts = bb_parse.get_exist_phase_timestamp()
+            processing.print_bb_result(phase_ts)
+            result_path = log_path + os.sep + 'bb_results.log'
+            processing.save_bb_result(phase_ts, result_path)
+        else:
+            print ("TPCx-BB log dir: {0} does not exist, existing...".format(log_path))
+            exit(-1)
+    else:
+        print ("Usage: python bb_parse.py $BB_Log_path")
+        exit(-1)
