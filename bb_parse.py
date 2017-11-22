@@ -19,8 +19,6 @@ from collections import OrderedDict
 import numpy as np
 import pandas as pd
 
-import processing
-
 
 class BBParse:
     """
@@ -243,6 +241,8 @@ if __name__ == '__main__':
             print 'Parsing TPCx-BB log files...\n'
             bb_parse.get_elapsed_time()
             phase_ts = bb_parse.get_exist_phase_timestamp()
+            import processing
+
             processing.print_bb_result(phase_ts)
             result_path = log_path + os.sep + 'bb_results.log'
             processing.save_bb_result(phase_ts, result_path)
