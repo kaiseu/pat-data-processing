@@ -2,6 +2,7 @@
 >Processing and visualize PAT data
 
 ## Usage: 
+>Processing PAT and TPCx-BB log data:
 ```shell
 python processing.py -p $pat_path
 python processing.py -p $pat_path -l $bb_log_path
@@ -11,7 +12,6 @@ python processing.py -p $pat_path -l $bb_log_path -q $query
 python processing.py -p $pat_path -l $bb_log_path -s true
 ```
 
-
 ### where:
 - $pat_path: is the PAT raw data path
 - $bb_log_path: optional, is the corresponding TPCx-BB log path
@@ -20,6 +20,25 @@ python processing.py -p $pat_path -l $bb_log_path -s true
 - $streamNumber: optinal, TPCx-BB throughput stream number, if only wants to calculate certain streams. Can input multi values seperated by space.
 - $query: optinal, TPCx-BB query number, if only wants to calculate certain queries. Can input multi values seperated by space.
 - -s, whether to save raw result data, default is false.
+
+
+>Processing multi PAT and TPCx-BB log pairs:
+```shell
+python multiinputs.py $parent_path
+```
+### where:
+- $parent_path: is the parent dir path of the PAT file pairs.
+PAT file starts with 'pat' and exists same postfix log file starts with 'logs', these two files will be regard as a
+pair. PAT file starts with 'PAT' and log file starts with 'LOGS', will also be regarded as a pair.
+
+
+>Processing only the TPCx-BB log file:
+```shell
+ python bb_parse.py $BB_Log_path
+```
+### where
+- $BB_Log_path: is the path of TPCx-BB log files.
+
 
 >The result which contains the average System resource utilization(CPU, Memory, Disk I/O, Network I/O...) of a cluster will be saved in $pat_path/pat_avg_all.txt
 
