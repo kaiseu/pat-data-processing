@@ -40,7 +40,8 @@ pair. PAT file starts with 'PAT' and log file starts with 'LOGS', will also be r
 - $BB_Log_path: is the path of TPCx-BB log files.
 
 
->The PAT result which contains the average System resource utilization(CPU, Memory, Disk I/O, Network I/O...) of a cluster will be saved in $pat_path/pat_avg_all.txt
+>The PAT result which contains the average System resource utilization(CPU, Memory, Disk I/O, Network I/O...) of a cluster will be saved in $pat_path/pat_avg_all.txt.
+
 >The TPCx-BB log of elapsed time will be saved in $BB_Log_path/bb_results.log.
 
 
