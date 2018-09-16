@@ -13,7 +13,7 @@
 
 import pandas as pd
 
-from base import CommonBase
+from component.base import CommonBase
 
 
 class Perf(CommonBase):

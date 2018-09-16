@@ -35,11 +35,11 @@ def get_node_attrib_data_by_time(attrib, start, end, file_path):
         if os.path.isfile(attrib_file):
             return AttribFactory.create_attrib(attrib, attrib_file).get_data_by_time(start, end)
         else:
-            print 'node does not have attribute {0}'.format(attrib)
+            print('node does not have attribute {0}'.format(attrib))
             exit(-1)
     else:
-        print 'Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
-            .format(attrib, AttribFactory.node_attrib.keys())
+        print('Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
+              .format(attrib, AttribFactory.node_attrib.keys()))
         exit(-1)
 
 
@@ -57,7 +57,7 @@ def get_cluster_attrib_data(pat_path, start, end, save_raw, attrib):
     if os.path.exists(pat_path):
         nodes = get_paths(pat_path)
     else:
-        print 'Path: {0} does not exist, will exit...'.format(pat_path)
+        print('Path: {0} does not exist, will exit...'.format(pat_path))
         exit(-1)
 
     pool = Pool(processes=None)

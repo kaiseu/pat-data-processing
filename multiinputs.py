@@ -19,7 +19,7 @@ import sys
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print ('Usage: python multiinputs.py $PATs_PARENT_PATH')
+        print('Usage: python multiinputs.py $PATs_PARENT_PATH')
         exit(-1)
     parent_path = sys.argv[1]
 
@@ -34,8 +34,8 @@ if __name__ == '__main__':
                 log_dirs.append(dir_name)
 
         if not (len(pat_dirs) > 0 and len(log_dirs) > 0):
-            print ('No PAT directory starts with "pat" or "PAT", or Log directory starts with "logs" or "LOGS" in {0},'
-                   ' exiting...'.format(parent_path))
+            print('No PAT directory starts with "pat" or "PAT", or Log directory starts with "logs" or "LOGS" in {0},'
+                  ' exiting...'.format(parent_path))
             exit(-1)
         assert len(pat_dirs) == len(log_dirs)
         pair = {}
@@ -45,17 +45,17 @@ if __name__ == '__main__':
                     pair[pat_dir] = log_dir
         script_path = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'processing.py'
         if not os.path.exists(script_path):
-            print ('Processing script does not exist in path: {0}, will exit...'.format(script_path))
+            print('Processing script does not exist in path: {0}, will exit...'.format(script_path))
             exit(-1)
         count = 1
         for pat_dir, log_dir in pair.items():
             pat_path = parent_path + os.sep + pat_dir
             log_path = parent_path + os.sep + log_dir
             command = 'python {0} -p {1} -l {2}'.format(script_path, pat_path, log_path)
-            print ('Starting to process file pair: {0}, {1}'.format(pat_path, log_path))
+            print('Starting to process file pair: {0}, {1}'.format(pat_path, log_path))
             subprocess.call(command, shell=True)
-            print ('{0} of total {1} pairs finished.'.format(count, len(pair)))
+            print('{0} of total {1} pairs finished.'.format(count, len(pair)))
             count += 1
-        print ('All file pairs have been finished!')
+        print('All file pairs have been finished!')
     else:
-        print ('Path: {0} does not exist, please check and try later.'.format(parent_path))
+        print('Path: {0} does not exist, please check and try later.'.format(parent_path))

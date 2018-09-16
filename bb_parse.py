@@ -47,7 +47,7 @@ class BBParse:
         if phase in self.phase_name:
             csv_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchTimes.csv'
             if not os.path.isfile(csv_path):
-                print 'BigBenchTimes.csv does not exist in {0}, existing...'.format(self.bb_log_path)
+                print('BigBenchTimes.csv does not exist in {0}, existing...'.format(self.bb_log_path))
                 exit(-1)
             df = pd.read_csv(csv_path, delimiter=';').loc[:,
                  ['benchmarkPhase', 'streamNumber', 'queryNumber', 'epochStartTimestamp', 'epochEndTimestamp']]
@@ -62,10 +62,10 @@ class BBParse:
                 return phase_start, phase_end
             elif len(stream_query_num) == 1:  # stream num is assigned
                 if phase == 'BENCHMARK':
-                    print 'BENCHMARK does not have stream number, you can only use ("BENCHMARK")'
+                    print('BENCHMARK does not have stream number, you can only use ("BENCHMARK")')
                 if (phase == 'POWER_TEST') & (int(stream_query_num[0]) > 0):
-                    print 'POWER_TEST does not have stream number greater than 0,' \
-                          ' you can use either ("POWER_TEST") or ("POWER_TEST", 0))'
+                    print('POWER_TEST does not have stream number greater than 0,' \
+                          ' you can use either ("POWER_TEST") or ("POWER_TEST", 0))')
                     exit(-1)
                 stream_num = ((df['streamNumber']) == int(stream_query_num[0]))
                 query_num = (pd.isnull(df['queryNumber']))
@@ -76,10 +76,10 @@ class BBParse:
                 return phase_start, phase_end
             elif len(stream_query_num) == 2:  # query num is assigned
                 if phase == 'BENCHMARK':
-                    print 'BENCHMARK does not have stream number or query number, you can only use ("BENCHMARK")'
+                    print('BENCHMARK does not have stream number or query number, you can only use ("BENCHMARK")')
                 if (phase == 'POWER_TEST') & (int(stream_query_num[0]) > 0):
-                    print 'POWER_TEST does not have stream number greater than 0,' \
-                          ' you can use either ("POWER_TEST", "0", "query_num"))'
+                    print('POWER_TEST does not have stream number greater than 0,' \
+                          ' you can use either ("POWER_TEST", "0", "query_num"))')
                     exit(-1)
                 stream_num = ((df['streamNumber']) == int(stream_query_num[0]))
                 query_num = ((df['queryNumber']) == int(stream_query_num[1]))
@@ -89,10 +89,10 @@ class BBParse:
                 phase_end = line['epochEndTimestamp'].values / 1000
                 return phase_start, phase_end
             else:
-                print 'maximum 3 inputs are allowed'
+                print('maximum 3 inputs are allowed')
                 exit(-1)
         else:
-            print 'phase name must be assigned! phase name only includes: {0}'.format(self.phase_name)
+            print('phase name must be assigned! phase name only includes: {0}'.format(self.phase_name))
             exit(-1)
 
     def get_exist_phase_timestamp(self):
@@ -103,7 +103,7 @@ class BBParse:
         """
         csv_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchTimes.csv'
         if not os.path.isfile(csv_path):
-            print 'BigBenchTimes.csv does not exist in {0}, existing...'.format(self.bb_log_path)
+            print('BigBenchTimes.csv does not exist in {0}, existing...'.format(self.bb_log_path))
             exit(-1)
         converter = {'benchmarkPhase': str, 'streamNumber': int, 'queryNumber': int,
                      'epochStartTimestamp': 'int64', 'epochEndTimestamp': 'int64'}
@@ -138,8 +138,8 @@ class BBParse:
         if is_exist:
             return phase_ts
         else:
-            print 'It seems BigBenchTimes.csv in {0} does not include any TPCx-BB phases, ' \
-                  'existing...'.format(self.bb_log_path)
+            print('It seems BigBenchTimes.csv in {0} does not include any TPCx-BB phases, ' \
+                  'existing...'.format(self.bb_log_path))
             exit(-1)
 
     def get_elapsed_time(self):
@@ -150,7 +150,7 @@ class BBParse:
         self.get_bb_result()
         csv_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchTimes.csv'
         if not os.path.isfile(csv_path):
-            print 'BigBenchTimes.csv does not exist in {0}, existing...'.format(self.bb_log_path)
+            print('BigBenchTimes.csv does not exist in {0}, existing...'.format(self.bb_log_path))
             exit(-1)
         df = pd.read_csv(csv_path, delimiter=';').loc[:,
              ['benchmarkPhase', 'streamNumber', 'queryNumber', 'durationInSeconds']]
@@ -177,16 +177,16 @@ class BBParse:
                         elapsed_time.index = df[mask]['queryNumber'].astype('int64')
                 is_exist = True
         if is_exist:
-            print '*' * 100
-            print 'Elapsed time of each query:\n {0} \n'.format(elapsed_time.to_string())
+            print('*' * 100)
+            print('Elapsed time of each query:\n {0} \n'.format(elapsed_time.to_string()))
 
             result_path = self.bb_log_path + os.sep + 'bb_results.log'
             with open(result_path, 'a') as f:
                 f.write('*' * 100 + '\n')
                 f.write('Elapsed time of each query:\n {0} \n'.format(elapsed_time.to_string()))
         else:
-            print 'It seems BigBenchTimes.csv in {0} does not include TPCx-BB phases:POWER_TEST, THROUGHPUT_TEST_1' \
-                  'existing...'.format(self.bb_log_path)
+            print('It seems BigBenchTimes.csv in {0} does not include TPCx-BB phases:POWER_TEST, THROUGHPUT_TEST_1' \
+                  'existing...'.format(self.bb_log_path))
             exit(-1)
 
     def get_bb_result(self):
@@ -196,7 +196,7 @@ class BBParse:
         """
         log_path = self.bb_log_path + os.sep + 'run-logs' + os.sep + 'BigBenchResult.log'
         if not os.path.isfile(log_path):
-            print 'BigBenchResult.log does not exist in {0}, existing...'.format(self.bb_log_path)
+            print('BigBenchResult.log does not exist in {0}, existing...'.format(self.bb_log_path))
             exit(-1)
         result = OrderedDict()
         with open(log_path, 'r') as f:
@@ -221,13 +221,13 @@ class BBParse:
                     value = line.split('=')[1].strip()
                     result[key] = float(value)
         result_path = self.bb_log_path + os.sep + 'bb_results.log'
-        print ('*' * 100)
-        print ('TPCx-BB results:')
+        print('*' * 100)
+        print('TPCx-BB results:')
         with open(result_path, 'w') as f:
             f.write('*' * 100 + '\n')
             f.write('TPCx-BB results: \n')
             for key, value in result.items():
-                print '{0}: {1}'.format(key, value)
+                print('{0}: {1}'.format(key, value))
                 f.write(key + ': ' + str(value) + '\n')
             f.write('\n')
 
@@ -238,7 +238,7 @@ if __name__ == '__main__':
         log_path = sys.argv[1]
         if os.path.exists(log_path):
             bb_parse = BBParse(log_path)
-            print 'Parsing TPCx-BB log files...\n'
+            print('Parsing TPCx-BB log files...\n')
             bb_parse.get_elapsed_time()
             phase_ts = bb_parse.get_exist_phase_timestamp()
             import processing
@@ -247,8 +247,8 @@ if __name__ == '__main__':
             result_path = log_path + os.sep + 'bb_results.log'
             processing.save_bb_result(phase_ts, result_path)
         else:
-            print ("TPCx-BB log dir: {0} does not exist, existing...".format(log_path))
+            print("TPCx-BB log dir: {0} does not exist, existing...".format(log_path))
             exit(-1)
     else:
-        print ("Usage: python bb_parse.py $BB_Log_path")
+        print("Usage: python bb_parse.py $BB_Log_path")
         exit(-1)

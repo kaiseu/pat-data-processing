@@ -45,7 +45,7 @@ class Cluster(Node):
         if os.path.exists(self.pat_path):
             return get_paths(self.pat_path)
         else:
-            print 'Path: {0} does not exist, will exit...'.format(self.pat_path)
+            print('Path: {0} does not exist, will exit...'.format(self.pat_path))
             exit(-1)
 
     def get_cluster_data_by_time(self, start, end, save_raw=False):
@@ -87,11 +87,11 @@ class Cluster(Node):
             if os.path.isfile(attrib_file):
                 return AttribFactory.create_attrib(attrib, attrib_file).get_data_by_time(start, end)
             else:
-                print 'node does not have attribute {0}'.format(attrib)
+                print('node does not have attribute {0}'.format(attrib))
                 exit(-1)
         else:
-            print 'Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
-                .format(attrib, AttribFactory.node_attrib.keys())
+            print('Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
+                  .format(attrib, AttribFactory.node_attrib.keys()))
             exit(-1)
 
     def get_cluster_attrib_data(self, attrib, start, end):
@@ -101,7 +101,7 @@ class Cluster(Node):
         for node in self.nodes:
             p = Process(target=self.get_node_attrib_data_by_time(), args=(node, attrib, start, end))
             p.start()
-        print tmp_avg
+        print(tmp_avg)
 
     def save_result(self, result, result_path):
         """
@@ -127,25 +127,25 @@ class Cluster(Node):
         if not option:
             attrib_avg = self.get_cluster_avg()
             for key in attrib_avg.keys():
-                print 'All nodes average {0} utilization: \n {1} \n' \
-                    .format(key, attrib_avg.get(key).to_string(index=False))
+                print('All nodes average {0} utilization: \n {1} \n' \
+                      .format(key, attrib_avg.get(key).to_string(index=False)))
             return
         num_input = len(option)
         if num_input == 1 or num_input > 3:
-            print 'Optional inputs must be (start_timestamp, end_timestamp) ' \
-                  'or (start_timestamp, end_timestamp, phase_name)'
+            print('Optional inputs must be (start_timestamp, end_timestamp) ' \
+                  'or (start_timestamp, end_timestamp, phase_name)')
             exit(-1)
         attrib_avg = self.get_cluster_avg_by_time(option[0], option[1])
         start_time = datetime.fromtimestamp(option[0]).strftime('%Y-%m-%d %H:%M:%S')
         end_time = datetime.fromtimestamp(option[1]).strftime('%Y-%m-%d %H:%M:%S')
 
         if num_input == 2:
-            print '\nAll nodes average utilization between {0} and {1}'.format(start_time, end_time)
+            print('\nAll nodes average utilization between {0} and {1}'.format(start_time, end_time))
         elif num_input == 3:
-            print '\nAll nodes average utilization for phase {0} between {1} and {2}:' \
-                .format(option[2], start_time, end_time)
+            print('\nAll nodes average utilization for phase {0} between {1} and {2}:' \
+                  .format(option[2], start_time, end_time))
         for key in attrib_avg.keys():
-            print 'Average {0} utilization: \n {1} \n'.format(key, attrib_avg.get(key).to_string(index=False))
+            print('Average {0} utilization: \n {1} \n'.format(key, attrib_avg.get(key).to_string(index=False)))
 
     def save_avg_results(self, *option):
         """
@@ -175,9 +175,9 @@ class Cluster(Node):
                 f.write('All nodes average utilization for phase {0} between {1} and {2}:\n'
                         .format(option[2], start_time, end_time))
             elif num_input == 1 or num_input > 3:
-                print 'optional inputs must be (start_timestamp, end_timestamp) ' \
-                      'or (start_timestamp, end_timestamp, phase)'
+                print('optional inputs must be (start_timestamp, end_timestamp) '
+                      'or (start_timestamp, end_timestamp, phase)')
                 exit(-1)
             for key in attrib_avg.keys():
                 f.write('\nAverage {0} utilization: \n {1} \n'.format(key, attrib_avg.get(key).to_string(index=False)))
-            print 'Results have been saved to: {0}'.format(result_file)
+            print('Results have been saved to: {0}'.format(result_file))

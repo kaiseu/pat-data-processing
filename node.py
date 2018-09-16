@@ -40,7 +40,7 @@ class Node:
             if names in AttribFactory().node_attrib.values():
                 exist_attrib.append(AttribFactory().get_attrib(names))
             else:
-                print '{0} module not implemented yet, will ignore it...\n'.format(names)
+                print('{0} module not implemented yet, will ignore it...\n'.format(names))
         return sorted(exist_attrib)
 
     def get_attrib_data_by_time(self, attrib, start, end):
@@ -56,9 +56,9 @@ class Node:
             if os.path.isfile(attrib_file):
                 return AttribFactory.create_attrib(attrib, attrib_file).get_data_by_time(start, end)
             else:
-                print 'node does not have attribute {0}'.format(attrib)
+                print('node does not have attribute {0}'.format(attrib))
                 exit(-1)
         else:
-            print 'Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
-                .format(attrib, AttribFactory.node_attrib.keys())
+            print('Node does not have attrib: {0} defined, defined attributions are: {1}, will exit...' \
+                  .format(attrib, AttribFactory.node_attrib.keys()))
             exit(-1)

@@ -58,5 +58,5 @@ class AttribFactory:
         elif attrib.lower() == 'jvms':
             return Jvms(file_path)
         else:
-            print 'No attrib: {0} defined, will exit...'.format(attrib)
+            print('No attrib: {0} defined, will exit...'.format(attrib))
             exit(-1)

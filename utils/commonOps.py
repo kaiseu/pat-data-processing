@@ -39,5 +39,5 @@ def get_file_names(path):
             names.extend(filenames)
             break
     else:
-        print 'path: %s does not exit, please check.' % path
+        print('path: %s does not exit, please check.' % path)
     return names

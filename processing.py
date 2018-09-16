@@ -31,14 +31,14 @@ def env_check():
     """
     py_version = sys.version_info
     if py_version[:2] >= (2, 7):
-        print "---- You currently have Python " + sys.version
+        print("---- You currently have Python " + sys.version)
     else:
-        print "---- Error, You need python 2.7.x+ and currently you have " + sys.version + 'exiting now...'
+        print("---- Error, You need python 2.7.x+ and currently you have " + sys.version + 'exiting now...')
         exit(-1)
     try:
         import numpy, pandas
     except ImportError:
-        print '---- missing dependency: numpy or pandas, please install first'
+        print('---- missing dependency: numpy or pandas, please install first')
         exit(-1)
 
     try:
@@ -47,7 +47,7 @@ def env_check():
         raise ImportError('HDFStore requires PyTables, "{ex}" problem '
                           'importing'.format(ex=str(ex)))
 
-    print '---- You have all required dependencies, starting to process'
+    print('---- You have all required dependencies, starting to process')
 
 
 def save_avg_result(*option):
@@ -68,7 +68,7 @@ def save_avg_result(*option):
                 f.write('All nodes average {0} utilization: \n {1} \n'
                         .format(key, attrib_avg.get(key).to_string(index=False)))
                 f.write('.' * 75 + '\n')
-        print 'Results have been saved to: {0}'.format(result_file)
+        print('Results have been saved to: {0}'.format(result_file))
         return
     elif len(option) == 2:  # pat_path and bb_log are assigned
         result_file = option[0] + os.sep + 'results.log'
@@ -88,7 +88,7 @@ def save_avg_result(*option):
                     f.write('All nodes average {0} utilization: \n {1} \n'
                             .format(key, attrib_avg.get(key).to_string(index=False)))
                     f.write('.' * 75 + '\n')
-        print 'Results have been saved to: {0}'.format(result_file)
+        print('Results have been saved to: {0}'.format(result_file))
         return
     elif len(option) == 3:  # pat_path, bb_log and phase_name are assigned
         result_file = option[0] + os.sep + 'results.log'
@@ -105,11 +105,11 @@ def save_avg_result(*option):
                 f.write('All nodes average {0} utilization: \n {1} \n'
                         .format(key, attrib_avg.get(key).to_string(index=False)))
                 f.write('.' * 75 + '\n')
-        print 'Results have been saved to: {0}'.format(result_file)
+        print('Results have been saved to: {0}'.format(result_file))
         return
     else:
-        print 'Usage: save_avg_result(pat_path) or save_avg_result(pat_path, bb_log_path) or ' \
-              'save_avg_result(pat_path, bb_log_path, BB_Phase)\n'
+        print('Usage: save_avg_result(pat_path) or save_avg_result(pat_path, bb_log_path) or ' \
+              'save_avg_result(pat_path, bb_log_path, BB_Phase)\n')
         exit(-1)
 
 
@@ -162,15 +162,15 @@ def run():
         else:  # pat_path and log_path are assigned
             if os.path.exists(log_path):
                 bb_parse = BBParse(log_path)
-                print 'Parsing TPCx-BB log files...\n'
+                print('Parsing TPCx-BB log files...\n')
                 bb_parse.get_elapsed_time()
                 phase_ts = bb_parse.get_exist_phase_timestamp()
                 print_bb_result(phase_ts)
                 result_path = log_path + os.sep + 'bb_results.log'
                 save_bb_result(phase_ts, result_path)
-                print 'Started to process PAT files...\n'
+                print('Started to process PAT files...\n')
             else:
-                print 'TPCx-BB log file path: {0} does not exist, exiting...'.format(log_path)
+                print('TPCx-BB log file path: {0} does not exist, exiting...'.format(log_path))
                 exit(-1)
 
             start_stamps = []
@@ -211,8 +211,8 @@ def run():
             elif not query:  # for throughput streams
                 num_streams = phase_ts['THROUGHPUT_TEST_1'].shape[0] - 1  # num of throughput steams from the log
                 if any(s >= num_streams for s in stream):  # check if input streamNumber is right
-                    print 'Number of throughput steams is {0}, so input streamNumber should not be ' \
-                          'greater than {1}, exiting...'.format(num_streams, num_streams - 1)
+                    print('Number of throughput steams is {0}, so input streamNumber should not be ' \
+                          'greater than {1}, exiting...'.format(num_streams, num_streams - 1))
                     exit(-1)
                 stream = [i + 1 for i in stream]  # index 1 corresponding to stream 0
                 start_stamps = map(int, (phase_ts['THROUGHPUT_TEST_1'].iloc[stream, 3] / 1000).tolist())
@@ -227,8 +227,8 @@ def run():
             elif not stream:  # for query
                 exist_queries = phase_ts['POWER_TEST'].iloc[:, 2].tolist()
                 if not set(query).issubset(set(exist_queries)):  # check if input queries existing in the log
-                    print 'Input query may not exist in the log, existing queries are: {0}, ' \
-                          'exiting...'.format(exist_queries[1:])
+                    print('Input query may not exist in the log, existing queries are: {0}, ' \
+                          'exiting...'.format(exist_queries[1:]))
                     exit(-1)
                 start_stamps = map(int, (phase_ts['POWER_TEST'].iloc[query, 3] / 1000).tolist())
                 end_stamps = map(int, (phase_ts['POWER_TEST'].iloc[query, 4] / 1000).tolist())
@@ -240,10 +240,10 @@ def run():
                 result_path = pat_path + os.sep + 'pat_avg.txt'
                 save_pat_result(cluster_avg, tag, result_path)
             else:
-                print 'The input arguments is not supported, exiting...'
+                print('The input arguments is not supported, exiting...')
                 exit(-1)
     else:
-        print 'PAT file path: {0} does not exist, exiting...'.format(pat_path)
+        print('PAT file path: {0} does not exist, exiting...'.format(pat_path))
         exit(-1)
 
 
@@ -261,8 +261,8 @@ def save_pat_result(cluster_avg, tag, result_path):
             f.write('*' * 100 + '\n')
             f.write('Average {0} utilization: \n {1} \n'.format(key, value.to_string()))
         f.write('*' * 100 + '\n')
-    print 'PAT results have been saved to {0} \n'.format(result_path)
-    print '*' * 100 + '\n'
+    print('PAT results have been saved to {0} \n'.format(result_path))
+    print('*' * 100 + '\n')
 
 
 def print_pat_result(cluster_avg, tag):
@@ -274,9 +274,9 @@ def print_pat_result(cluster_avg, tag):
     """
     for key, value in cluster_avg.items():
         value = value.set_index([tag])
-        print '*' * 100
-        print 'Average {0} utilization: \n {1} \n'.format(key, value.to_string()),
-    print '*' * 100 + '\n'
+        print('*' * 100)
+        print('Average {0} utilization: \n {1} \n'.format(key, value.to_string())),
+    print('*' * 100 + '\n')
 
 
 def print_bb_result(phase_ts):
@@ -295,9 +295,9 @@ def print_bb_result(phase_ts):
         end = pd.to_datetime(end, unit='s')
 
         df.loc[key] = [start, end, convert_timedelta(during)]
-    print '*' * 100
-    print 'Elapsed Time for each Phase: \n'
-    print df.to_string()
+    print('*' * 100)
+    print('Elapsed Time for each Phase: \n')
+    print(df.to_string())
 
 
 def save_bb_result(phase_ts, result_path):
@@ -319,9 +319,9 @@ def save_bb_result(phase_ts, result_path):
     with open(result_path, 'a') as f:
         f.write('\n' + '*' * 100 + '\n')
         f.write('Elapsed Time for each Phase: \n {0} \n'.format(df.to_string()))
-    print '*' * 100 + '\n'
-    print 'Log results have been saved to {0} \n'.format(result_path)
-    print '*' * 100 + '\n'
+    print('*' * 100 + '\n')
+    print('Log results have been saved to {0} \n'.format(result_path))
+    print('*' * 100 + '\n')
 
 
 def convert_timedelta(duration):
@@ -355,19 +355,19 @@ def is_log_exist(pat_path):
         logs_name = pat_name.replace('pat', 'LOGS', 1)
     log_path = parent_path + os.sep + logs_name
     if os.path.exists(log_path):  # corresponding log file exists
-        print ('Existing corresponding TPCx-BB log file in the parent directory of current PAT path, '
-               'will regard it as corresponding log file...\n')
-        print os.path.abspath(__file__)
+        print('Existing corresponding TPCx-BB log file in the parent directory of current PAT path, '
+              'will regard it as corresponding log file...\n')
+        print(os.path.abspath(__file__))
         command = 'python {0} -p {1} -l {2}'.format(os.path.abspath(__file__), pat_path, log_path)
         subprocess.call(command, shell=True)
         exit(0)
     else:
-        print ('Can not find corresponding TPCx-BB log file automatically, '
-               'will calculate only using the assigned PAT file...\n')
+        print('Can not find corresponding TPCx-BB log file automatically, '
+              'will calculate only using the assigned PAT file...\n')
 
 
 if __name__ == '__main__':
     start = time.time()
     run()
     end = time.time()
-    print 'Processing elapsed time: {0}'.format(end - start)
+    print('Processing elapsed time: {0}'.format(end - start))
